@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9405DAA6-0BB5-4D25-B701-6B1461F20EB1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MinesweeperSolver.GameSimulator</RootNamespace>
-    <AssemblyName>MinesweeperSolver.GameSimulator</AssemblyName>
+    <ProjectGuid>{35DEB6D9-F51F-4C8C-929A-E25490F63120}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MinesweeperSolver.ConsoleRunner</RootNamespace>
+    <AssemblyName>MinesweeperSolver.ConsoleRunner</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -40,13 +42,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MinesweeperGame.cs" />
-    <Compile Include="Models\Board.cs" />
-    <Compile Include="Models\EmptySquare.cs" />
-    <Compile Include="Models\MineSquare.cs" />
-    <Compile Include="Models\Square.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MinesweeperSolver.GameSimulator\MinesweeperSolver.GameSimulator.csproj">
+      <Project>{9405daa6-0bb5-4d25-b701-6b1461f20eb1}</Project>
+      <Name>MinesweeperSolver.GameSimulator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
