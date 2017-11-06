@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MinesweeperSolver.GameSimulator.Models
 {
-    public abstract class Square
+    public abstract class Tile
     {
     }
 }
