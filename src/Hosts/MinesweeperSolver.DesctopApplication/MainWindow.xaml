@@ -8,8 +8,16 @@
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         Title="MainWindow">
-    <!--Height="300" Width="300"-->
     <Grid x:Name="LayoutRoot">
-        <!--<local:MinesweeperTile></local:MinesweeperTile>-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Orientation="Horizontal">
+            <Button Width="100" Click="Button_Click">Restart</Button>
+            <Label x:Name="Count"></Label>
+        </StackPanel>
+        <Grid x:Name="MineField" Grid.Row="1">
+        </Grid>
     </Grid>
 </Window>

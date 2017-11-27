@@ -26,26 +26,40 @@ namespace MinesweeperSolver.DesctopApplication
         {
             InitializeComponent();
 
+            Restart();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            MineField.ColumnDefinitions.Clear();
+            MineField.RowDefinitions.Clear();
+            MineField.Children.Clear();
+
+            Restart();
+        }
+
+        private void Restart()
+        {
             const byte ColCount = 30;
             const byte RowCount = 20;
-            const int BombCount = 60;
+            const int BombCount = 150;
 
             // Create Columns
             for (int i = 0; i < ColCount; i++)
             {
                 var gridCol = new ColumnDefinition { Width = new GridLength(30) };
-                LayoutRoot.ColumnDefinitions.Add(gridCol);
+                MineField.ColumnDefinitions.Add(gridCol);
             }
 
             // Create Rows
             for (int i = 0; i < RowCount; i++)
             {
                 var gridRow = new RowDefinition { Height = new GridLength(30) };
-                LayoutRoot.RowDefinitions.Add(gridRow);
+                MineField.RowDefinitions.Add(gridRow);
             }
 
-            LayoutRoot.Width = 30 * ColCount;
-            LayoutRoot.Height = 30 * RowCount;
+            MineField.Width = 30 * ColCount;
+            MineField.Height = 30 * RowCount;
 
             var board = new Board(ColCount, RowCount);
             var generator = new MineGenerator();
@@ -76,7 +90,7 @@ namespace MinesweeperSolver.DesctopApplication
                     Grid.SetColumn(tile, i);
                     Grid.SetRow(tile, j);
 
-                    LayoutRoot.Children.Add(tile);
+                    MineField.Children.Add(tile);
                 }
             }
 
