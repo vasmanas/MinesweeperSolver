@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinesweeperSolver.GameSimulator", "src\MinesweeperSolver.GameSimulator\MinesweeperSolver.GameSimulator.csproj", "{9405DAA6-0BB5-4D25-B701-6B1461F20EB1}"
 EndProject
@@ -10,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinesweeperSolver.ConsoleRunner", "src\Hosts\MinesweeperSolver.ConsoleRunner\MinesweeperSolver.ConsoleRunner.csproj", "{35DEB6D9-F51F-4C8C-929A-E25490F63120}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinesweeperSolver.GameSimulator.Tests", "src\MinesweeperSolver.GameSimulator.Tests\MinesweeperSolver.GameSimulator.Tests.csproj", "{11EC9096-D34F-4B70-8645-10D6A8489E31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinesweeperSolver.NeuralSolver", "src\MinesweeperSolver.NeuralSolver\MinesweeperSolver.NeuralSolver.csproj", "{244E2377-A1C1-4CDF-B562-7B11435105A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinesweeperSolver.DesctopApplication", "src\Hosts\MinesweeperSolver.DesctopApplication\MinesweeperSolver.DesctopApplication.csproj", "{780948C7-4A8C-409A-86F2-B926BEAD545D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +33,21 @@ Global
 		{11EC9096-D34F-4B70-8645-10D6A8489E31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11EC9096-D34F-4B70-8645-10D6A8489E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11EC9096-D34F-4B70-8645-10D6A8489E31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{244E2377-A1C1-4CDF-B562-7B11435105A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{244E2377-A1C1-4CDF-B562-7B11435105A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{244E2377-A1C1-4CDF-B562-7B11435105A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{244E2377-A1C1-4CDF-B562-7B11435105A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{780948C7-4A8C-409A-86F2-B926BEAD545D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{780948C7-4A8C-409A-86F2-B926BEAD545D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{780948C7-4A8C-409A-86F2-B926BEAD545D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{780948C7-4A8C-409A-86F2-B926BEAD545D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{35DEB6D9-F51F-4C8C-929A-E25490F63120} = {9486CE91-3615-4E55-A405-1E7A856DC739}
+		{780948C7-4A8C-409A-86F2-B926BEAD545D} = {9486CE91-3615-4E55-A405-1E7A856DC739}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E36C718-573D-4084-8784-DB4A0521548B}

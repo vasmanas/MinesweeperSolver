@@ -1,9 +1,5 @@
 ﻿using MinesweeperSolver.GameSimulator.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MinesweeperSolver.GameSimulator
 {
@@ -28,8 +24,7 @@ namespace MinesweeperSolver.GameSimulator
                     x = rnd.Next(0, board.Width);
                     y = rnd.Next(0, board.Height);
                 } while (board.IsMineAt(x, y));
-
-
+                
                 board.Tiles[x, y] = new MineTile();
             }
 

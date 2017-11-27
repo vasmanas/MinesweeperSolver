@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MinesweeperSolver.GameSimulator.Models
+﻿namespace MinesweeperSolver.GameSimulator.Models
 {
     public class MineTile : Tile
     {
+        public override bool IsMine()
+        {
+            return true;
+        }
     }
 }

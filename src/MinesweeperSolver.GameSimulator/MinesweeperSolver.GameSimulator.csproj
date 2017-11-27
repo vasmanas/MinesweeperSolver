@@ -46,6 +46,7 @@
     <Compile Include="Models\EmptyTile.cs" />
     <Compile Include="Models\MineTile.cs" />
     <Compile Include="Models\Tile.cs" />
+    <Compile Include="Models\VisibilityLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

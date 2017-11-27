@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MinesweeperSolver.GameSimulator.Models
 {
@@ -34,17 +30,22 @@ namespace MinesweeperSolver.GameSimulator.Models
         /// </summary>
         public Tile[,] Tiles { get; }
 
-        public bool IsMineAt(int x, int y)
+        public virtual bool IsMineAt(int x, int y)
         {
             if (x < 0 || x > Width - 1 || y < 0 || y > Height - 1)
             {
                 return false;
             }
 
-            return Tiles[x, y] is MineTile;
+            if (Tiles[x, y] is null)
+            {
+                return false;
+            }
+
+            return Tiles[x, y].IsMine();
         }
 
-        public int SuroundingMines(int x, int y)
+        public virtual int SuroundingMines(int x, int y)
         {
             return (this.IsMineAt(x - 1, y - 1) ? 1 : 0)
             + (this.IsMineAt(x, y - 1) ? 1 : 0)
