@@ -51,8 +51,10 @@ namespace MinesweeperSolver.DesctopApplication
             var generator = new MineGenerator();
             generator.Fill(board, BombCount);
 
-            // Stop game when blow up
-            // Open when zero is pressed
+            // TODO: Open when zero is pressed
+            // TODO: Stop game when blow up
+
+            var viewTiles = new MinesweeperTile[ColCount, RowCount];
 
             for (int i = 0; i < ColCount; i++)
             {
@@ -69,10 +71,71 @@ namespace MinesweeperSolver.DesctopApplication
                         tile = new MinesweeperTile((byte)board.SuroundingMines(i, j));
                     }
 
+                    viewTiles[i, j] = tile;
+
                     Grid.SetColumn(tile, i);
                     Grid.SetRow(tile, j);
 
                     LayoutRoot.Children.Add(tile);
+                }
+            }
+
+            for (int i = 0; i < ColCount; i++)
+            {
+                for (int j = 0; j < RowCount; j++)
+                {
+                    if (board.IsMineAt(i, j))
+                    {
+                        continue;
+                    }
+
+                    if (board.SuroundingMines(i, j) != 0)
+                    {
+                        continue;
+                    }
+
+                    var model = viewTiles[i, j].Model;
+
+                    // Add neighbours
+                    if (i > 0)
+                    {
+                        if (j > 0)
+                        {
+                            model.Addneighbour(viewTiles[i - 1, j - 1].Model);
+                        }
+
+                        model.Addneighbour(viewTiles[i - 1, j].Model);
+
+                        if (j < RowCount - 1)
+                        {
+                            model.Addneighbour(viewTiles[i - 1, j + 1].Model);
+                        }
+                    }
+
+                    if (j > 0)
+                    {
+                        model.Addneighbour(viewTiles[i, j - 1].Model);
+                    }
+
+                    if (j < RowCount - 1)
+                    {
+                        model.Addneighbour(viewTiles[i, j + 1].Model);
+                    }
+
+                    if (i < ColCount - 1)
+                    {
+                        if (j > 0)
+                        {
+                            model.Addneighbour(viewTiles[i + 1, j - 1].Model);
+                        }
+
+                        model.Addneighbour(viewTiles[i + 1, j].Model);
+
+                        if (j < RowCount - 1)
+                        {
+                            model.Addneighbour(viewTiles[i + 1, j + 1].Model);
+                        }
+                    }
                 }
             }
         }

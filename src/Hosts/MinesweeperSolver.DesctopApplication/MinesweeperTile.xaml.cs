@@ -9,34 +9,34 @@ namespace MinesweeperSolver.DesctopApplication
     /// </summary>
     public partial class MinesweeperTile : UserControl
     {
-        private TileViewModel _model;
-
         public MinesweeperTile()
         {
             InitializeComponent();
 
-            _model = new TileViewModel();
+            Model = new TileViewModel();
 
-            this.DataContext = _model;
+            this.DataContext = Model;
         }
+
+        public TileViewModel Model { get; }
 
         public MinesweeperTile(byte surroundingBombCount)
         {
             InitializeComponent();
 
-            _model = new TileViewModel(surroundingBombCount);
+            Model = new TileViewModel(surroundingBombCount);
 
-            this.DataContext = _model;
+            this.DataContext = Model;
         }
 
         private void Rectangle_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            _model.Open();
+            Model.Open();
         }
 
         private void Rectangle_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            _model.Flag();
+            Model.Flag();
         }
     }
 }
