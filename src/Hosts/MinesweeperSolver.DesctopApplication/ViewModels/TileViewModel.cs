@@ -9,15 +9,17 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
         private bool _covered = true;
         private bool _flag = false;
         private byte _count = 0;
-        private bool _bomb = false;
+        private bool _mine = false;
         private readonly List<TileViewModel> _neighbours = new List<TileViewModel>();
+        private readonly GameProgress _progress;
 
-        public TileViewModel()
+        public TileViewModel(GameProgress progress)
         {
-            _bomb = true;
+            _mine = true;
+            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
         }
 
-        public TileViewModel(byte surroundingBombCount)
+        public TileViewModel(GameProgress progress, byte surroundingBombCount)
         {
             if (surroundingBombCount < 0 || surroundingBombCount > 8)
             {
@@ -25,32 +27,14 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
             }
 
             _count = surroundingBombCount;
+            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
         }
 
         public bool Hidden { get { return _covered && !_flag; } }
         public bool Flagged { get { return _covered && _flag; } }
-        public bool Uncovered { get { return !_covered && !_bomb; } }
-        public string Count {
-            get
-            {
-                if (_count > 0)
-                {
-                    return _count.ToString();
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
-        }
-
-        public bool Blew
-        {
-            get
-            {
-                return !_covered && _bomb;
-            }
-        }
+        public bool Uncovered { get { return !_covered && !_mine; } }
+        public string Count { get { return _count == 0 ? string.Empty : _count.ToString(); } }
+        public bool Blew { get { return !_covered && _mine; } }
 
         public void Open()
         {
@@ -60,15 +44,20 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
             }
 
             this._covered = false;
+
             this.NotifyPropertyChanged("Hidden");
             this.NotifyPropertyChanged("Flagged");
             this.NotifyPropertyChanged("Uncovered");
             this.NotifyPropertyChanged("Blew");
 
-            if (_bomb)
+            if (_mine)
             {
+                _progress.Lost();
+
                 return;
             }
+
+            _progress.OpenTile();
 
             if (_count > 0)
             {
@@ -88,7 +77,17 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
                 return;
             }
 
+            if (_flag)
+            {
+                _progress.RemoveFlag(_mine);
+            }
+            else
+            {
+                _progress.PlaceFlag(_mine);
+            }
+
             this._flag = !this._flag;
+
             this.NotifyPropertyChanged("Hidden");
             this.NotifyPropertyChanged("Flagged");
         }
@@ -100,7 +99,7 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
                 throw new ArgumentNullException(nameof(neighbour));
             }
 
-            if (_bomb)
+            if (_mine)
             {
                 return;
             }

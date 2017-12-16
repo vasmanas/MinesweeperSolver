@@ -1,9 +1,11 @@
-﻿using MinesweeperSolver.GameSimulator;
+﻿using MinesweeperSolver.DesctopApplication.ViewModels;
+using MinesweeperSolver.GameSimulator;
 using MinesweeperSolver.GameSimulator.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,64 +28,82 @@ namespace MinesweeperSolver.DesctopApplication
         {
             InitializeComponent();
 
-            Restart();
+            const byte ColCnt = 30;
+            const byte RowCnt = 20;
+            const int BombCnt = 150;
+
+            ColumnCount.Text = ColCnt.ToString();
+            RowCount.Text = RowCnt.ToString();
+            BombCount.Text = BombCnt.ToString();
+
+            Restart(ColCnt, RowCnt, BombCnt);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            Statistics.Content = string.Empty;
+
             MineField.ColumnDefinitions.Clear();
             MineField.RowDefinitions.Clear();
             MineField.Children.Clear();
 
-            Restart();
+            var ccnt = byte.Parse(ColumnCount.Text);
+            var rcnt = byte.Parse(RowCount.Text);
+            var bcnt = int.Parse(BombCount.Text);
+
+            Restart(ccnt, rcnt, bcnt);
         }
 
-        private void Restart()
+        private void PositiveInteger_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            const byte ColCount = 30;
-            const byte RowCount = 20;
-            const int BombCount = 150;
+            e.Handled = !IsPositiveInteger(e.Text);
+        }
+
+        private void Restart(byte colCount, byte rowCount, int mineCount)
+        {
+            const double ColumWidth = 30;
+            const double RowHeight = 30;
 
             // Create Columns
-            for (int i = 0; i < ColCount; i++)
+            for (int i = 0; i < colCount; i++)
             {
-                var gridCol = new ColumnDefinition { Width = new GridLength(30) };
+                var gridCol = new ColumnDefinition { Width = new GridLength(ColumWidth) };
                 MineField.ColumnDefinitions.Add(gridCol);
             }
 
             // Create Rows
-            for (int i = 0; i < RowCount; i++)
+            for (int i = 0; i < rowCount; i++)
             {
-                var gridRow = new RowDefinition { Height = new GridLength(30) };
+                var gridRow = new RowDefinition { Height = new GridLength(RowHeight) };
                 MineField.RowDefinitions.Add(gridRow);
             }
 
-            MineField.Width = 30 * ColCount;
-            MineField.Height = 30 * RowCount;
+            MineField.Width = ColumWidth * colCount;
+            MineField.Height = RowHeight * rowCount;
 
-            var board = new Board(ColCount, RowCount);
+            var board = new Board(colCount, rowCount);
             var generator = new MineGenerator();
-            generator.Fill(board, BombCount);
+            generator.Fill(board, mineCount);
 
-            // TODO: Open when zero is pressed
-            // TODO: Stop game when blow up
+            var viewTiles = new MinesweeperTile[colCount, rowCount];
 
-            var viewTiles = new MinesweeperTile[ColCount, RowCount];
-
-            for (int i = 0; i < ColCount; i++)
+            void EndGame(string statistics)
             {
-                for (int j = 0; j < RowCount; j++)
-                {
-                    MinesweeperTile tile;
+                OpenBoard(viewTiles, board);
 
-                    if (board.IsMineAt(i, j))
-                    {
-                        tile = new MinesweeperTile();
-                    }
-                    else
-                    {
-                        tile = new MinesweeperTile((byte)board.SuroundingMines(i, j));
-                    }
+                Statistics.Content = statistics;
+            }
+
+            var progress = new GameProgress(colCount * rowCount, mineCount, EndGame);
+
+            for (int i = 0; i < colCount; i++)
+            {
+                for (int j = 0; j < rowCount; j++)
+                {
+                    var tile =
+                        board.IsMineAt(i, j) ?
+                        new MinesweeperTile(progress) :
+                        new MinesweeperTile(progress, (byte)board.SuroundingMines(i, j));
 
                     viewTiles[i, j] = tile;
 
@@ -94,9 +114,9 @@ namespace MinesweeperSolver.DesctopApplication
                 }
             }
 
-            for (int i = 0; i < ColCount; i++)
+            for (int i = 0; i < colCount; i++)
             {
-                for (int j = 0; j < RowCount; j++)
+                for (int j = 0; j < rowCount; j++)
                 {
                     if (board.IsMineAt(i, j))
                     {
@@ -120,7 +140,7 @@ namespace MinesweeperSolver.DesctopApplication
 
                         model.Addneighbour(viewTiles[i - 1, j].Model);
 
-                        if (j < RowCount - 1)
+                        if (j < rowCount - 1)
                         {
                             model.Addneighbour(viewTiles[i - 1, j + 1].Model);
                         }
@@ -131,12 +151,12 @@ namespace MinesweeperSolver.DesctopApplication
                         model.Addneighbour(viewTiles[i, j - 1].Model);
                     }
 
-                    if (j < RowCount - 1)
+                    if (j < rowCount - 1)
                     {
                         model.Addneighbour(viewTiles[i, j + 1].Model);
                     }
 
-                    if (i < ColCount - 1)
+                    if (i < colCount - 1)
                     {
                         if (j > 0)
                         {
@@ -145,13 +165,48 @@ namespace MinesweeperSolver.DesctopApplication
 
                         model.Addneighbour(viewTiles[i + 1, j].Model);
 
-                        if (j < RowCount - 1)
+                        if (j < rowCount - 1)
                         {
                             model.Addneighbour(viewTiles[i + 1, j + 1].Model);
                         }
                     }
                 }
             }
+        }
+
+        private void OpenBoard(MinesweeperTile[,] viewTiles, Board board)
+        {
+            var colCount = viewTiles.GetLength(0);
+            var rowCount = viewTiles.GetLength(1);
+
+            for (int i = 0; i < colCount; i++)
+            {
+                for (int j = 0; j < rowCount; j++)
+                {
+                    var vm = viewTiles[i, j].Model;
+
+                    if (board.IsMineAt(i, j))
+                    {
+                        if (vm.Hidden)
+                        {
+                            vm.Flag();
+                        }
+                    }
+                    else
+                    {
+                        if (!vm.Uncovered)
+                        {
+                            vm.Open();
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool IsPositiveInteger(string text)
+        {
+            var regex = new Regex("[0-9]+");
+            return regex.IsMatch(text);
         }
     }
 }

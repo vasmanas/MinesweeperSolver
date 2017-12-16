@@ -1,4 +1,5 @@
 ﻿using MinesweeperSolver.DesctopApplication.ViewModels;
+using System;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -9,22 +10,22 @@ namespace MinesweeperSolver.DesctopApplication
     /// </summary>
     public partial class MinesweeperTile : UserControl
     {
-        public MinesweeperTile()
+        public MinesweeperTile(GameProgress progress)
         {
             InitializeComponent();
 
-            Model = new TileViewModel();
+            Model = new TileViewModel(progress);
 
             this.DataContext = Model;
         }
 
         public TileViewModel Model { get; }
 
-        public MinesweeperTile(byte surroundingBombCount)
+        public MinesweeperTile(GameProgress progress, byte surroundingBombCount)
         {
             InitializeComponent();
 
-            Model = new TileViewModel(surroundingBombCount);
+            Model = new TileViewModel(progress, surroundingBombCount);
 
             this.DataContext = Model;
         }

@@ -13,9 +13,19 @@
             <RowDefinition Height="30" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" HorizontalAlignment="Left" Orientation="Horizontal">
             <Button Width="100" Click="Button_Click">Restart</Button>
-            <Label x:Name="Count"></Label>
+            <Label>Columns:</Label>
+            <TextBox x:Name="ColumnCount" VerticalAlignment="Center" PreviewTextInput="PositiveInteger_PreviewTextInput" Width="40"></TextBox>
+            <Label>Rows:</Label>
+            <TextBox x:Name="RowCount" VerticalAlignment="Center" PreviewTextInput="PositiveInteger_PreviewTextInput" Width="40"></TextBox>
+            <Label>Bombs:</Label>
+            <TextBox x:Name="BombCount" VerticalAlignment="Center" PreviewTextInput="PositiveInteger_PreviewTextInput" Width="40"></TextBox>
+            <Label x:Name="Count" />
+            <Label x:Name="Statistics" />
         </StackPanel>
         <Grid x:Name="MineField" Grid.Row="1">
         </Grid>
