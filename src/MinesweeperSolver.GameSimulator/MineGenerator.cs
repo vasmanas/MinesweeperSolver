@@ -25,7 +25,7 @@ namespace MinesweeperSolver.GameSimulator
                     y = rnd.Next(0, board.Height);
                 } while (board.IsMineAt(x, y));
                 
-                board.Tiles[x, y] = new MineTile();
+                board.Tiles[x, y] = new Tile(true);
             }
 
             for (int i = 0; i < board.Width; i++)
@@ -34,7 +34,7 @@ namespace MinesweeperSolver.GameSimulator
                 {
                     if (board.Tiles[i, j] is null)
                     {
-                        board.Tiles[i, j] = new EmptyTile();
+                        board.Tiles[i, j] = new Tile(false);
                     }
                 }
             }

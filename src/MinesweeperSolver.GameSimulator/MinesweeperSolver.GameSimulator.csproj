@@ -43,8 +43,6 @@
     <Compile Include="MineGenerator.cs" />
     <Compile Include="MinesweeperGame.cs" />
     <Compile Include="Models\Board.cs" />
-    <Compile Include="Models\EmptyTile.cs" />
-    <Compile Include="Models\MineTile.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Models\VisibilityLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

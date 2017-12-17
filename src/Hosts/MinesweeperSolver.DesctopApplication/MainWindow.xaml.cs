@@ -30,7 +30,7 @@ namespace MinesweeperSolver.DesctopApplication
 
             const byte ColCnt = 30;
             const byte RowCnt = 20;
-            const int BombCnt = 150;
+            const int BombCnt = 120;
 
             ColumnCount.Text = ColCnt.ToString();
             RowCount.Text = RowCnt.ToString();

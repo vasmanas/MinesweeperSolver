@@ -1,7 +1,14 @@
 ﻿namespace MinesweeperSolver.GameSimulator.Models
 {
-    public abstract class Tile
+    public class Tile
     {
-        public abstract bool IsMine();
+        private readonly bool _isMine;
+
+        public Tile(bool isMine)
+        {
+            this._isMine = isMine;
+        }
+
+        public bool IsMine => _isMine;
     }
 }

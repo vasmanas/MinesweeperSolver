@@ -20,7 +20,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
 
             generator.Fill(board, 1);
 
-            Assert.IsInstanceOfType(board.Tiles[0, 0], typeof(MineTile));
+            Assert.IsTrue(board.Tiles[0, 0].IsMine);
         }
 
         [TestMethod]
@@ -40,13 +40,13 @@ namespace MinesweeperSolver.GameSimulator.Tests
             {
                 for (int j = 0; j < board.Height; j++)
                 {
-                    if (board.Tiles[i, j] is EmptyTile)
-                    {
-                        emptyTileCount++;
-                    }
-                    else if (board.Tiles[i, j] is MineTile)
+                    if (board.Tiles[i, j].IsMine)
                     {
                         minedTileCount++;
+                    }
+                    else
+                    {
+                        emptyTileCount++;
                     }
                 }
             }

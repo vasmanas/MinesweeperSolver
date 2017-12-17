@@ -42,7 +42,7 @@ namespace MinesweeperSolver.GameSimulator.Models
                 return false;
             }
 
-            return Tiles[x, y].IsMine();
+            return Tiles[x, y].IsMine;
         }
 
         public virtual int SuroundingMines(int x, int y)
