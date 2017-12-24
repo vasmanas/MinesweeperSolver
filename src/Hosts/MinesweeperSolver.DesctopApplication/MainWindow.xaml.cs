@@ -81,127 +81,66 @@ namespace MinesweeperSolver.DesctopApplication
             MineField.Width = ColumWidth * colCount;
             MineField.Height = RowHeight * rowCount;
 
-            var board = new Board(colCount, rowCount);
-            var generator = new MineGenerator();
-            generator.Fill(board, mineCount);
+            var generator = new BoardGeneratorService();
+            var board = new Board(colCount, rowCount, mineCount, generator, () => { /* TODO: blow */ });
 
             var viewTiles = new MinesweeperTile[colCount, rowCount];
 
-            void EndGame(string statistics)
-            {
-                OpenBoard(viewTiles, board);
+            //// TODO: Use
+            //void EndGame(string statistics)
+            //{
+            //    OpenBoard(viewTiles, board);
 
-                Statistics.Content = statistics;
-            }
+            //    Statistics.Content = statistics;
+            //}
 
-            var progress = new GameProgress(colCount * rowCount, mineCount, EndGame);
-
-            for (int i = 0; i < colCount; i++)
-            {
-                for (int j = 0; j < rowCount; j++)
-                {
-                    var tile =
-                        board.IsMineAt(i, j) ?
-                        new MinesweeperTile(progress) :
-                        new MinesweeperTile(progress, (byte)board.SuroundingMines(i, j));
-
-                    viewTiles[i, j] = tile;
-
-                    Grid.SetColumn(tile, i);
-                    Grid.SetRow(tile, j);
-
-                    MineField.Children.Add(tile);
-                }
-            }
+            //// TODO: Use
+            //var progress = new GameProgress(colCount * rowCount, mineCount, EndGame);
 
             for (int i = 0; i < colCount; i++)
             {
                 for (int j = 0; j < rowCount; j++)
                 {
-                    if (board.IsMineAt(i, j))
-                    {
-                        continue;
-                    }
+                    var viewTile = new MinesweeperTile(board, i, j);
 
-                    if (board.SuroundingMines(i, j) != 0)
-                    {
-                        continue;
-                    }
+                    viewTiles[i, j] = viewTile;
 
-                    var model = viewTiles[i, j].Model;
+                    Grid.SetColumn(viewTile, i);
+                    Grid.SetRow(viewTile, j);
 
-                    // Add neighbours
-                    if (i > 0)
-                    {
-                        if (j > 0)
-                        {
-                            model.Addneighbour(viewTiles[i - 1, j - 1].Model);
-                        }
-
-                        model.Addneighbour(viewTiles[i - 1, j].Model);
-
-                        if (j < rowCount - 1)
-                        {
-                            model.Addneighbour(viewTiles[i - 1, j + 1].Model);
-                        }
-                    }
-
-                    if (j > 0)
-                    {
-                        model.Addneighbour(viewTiles[i, j - 1].Model);
-                    }
-
-                    if (j < rowCount - 1)
-                    {
-                        model.Addneighbour(viewTiles[i, j + 1].Model);
-                    }
-
-                    if (i < colCount - 1)
-                    {
-                        if (j > 0)
-                        {
-                            model.Addneighbour(viewTiles[i + 1, j - 1].Model);
-                        }
-
-                        model.Addneighbour(viewTiles[i + 1, j].Model);
-
-                        if (j < rowCount - 1)
-                        {
-                            model.Addneighbour(viewTiles[i + 1, j + 1].Model);
-                        }
-                    }
+                    MineField.Children.Add(viewTile);
                 }
             }
         }
 
-        private void OpenBoard(MinesweeperTile[,] viewTiles, Board board)
-        {
-            var colCount = viewTiles.GetLength(0);
-            var rowCount = viewTiles.GetLength(1);
+        //private void OpenBoard(MinesweeperTile[,] viewTiles, Board board)
+        //{
+        //    var colCount = viewTiles.GetLength(0);
+        //    var rowCount = viewTiles.GetLength(1);
 
-            for (int i = 0; i < colCount; i++)
-            {
-                for (int j = 0; j < rowCount; j++)
-                {
-                    var vm = viewTiles[i, j].Model;
+        //    for (int i = 0; i < colCount; i++)
+        //    {
+        //        for (int j = 0; j < rowCount; j++)
+        //        {
+        //            var vm = viewTiles[i, j].Model;
 
-                    if (board.IsMineAt(i, j))
-                    {
-                        if (vm.Hidden)
-                        {
-                            vm.Flag();
-                        }
-                    }
-                    else
-                    {
-                        if (!vm.Uncovered)
-                        {
-                            vm.Open();
-                        }
-                    }
-                }
-            }
-        }
+        //            if (board.IsMineAt(i, j))
+        //            {
+        //                if (vm.Hidden)
+        //                {
+        //                    vm.Flag();
+        //                }
+        //            }
+        //            else
+        //            {
+        //                if (!vm.Uncovered)
+        //                {
+        //                    vm.Open();
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         private bool IsPositiveInteger(string text)
         {

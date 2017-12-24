@@ -40,11 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MineGenerator.cs" />
-    <Compile Include="MinesweeperGame.cs" />
+    <Compile Include="BoardGeneratorService.cs" />
+    <Compile Include="IBoardGeneratorService.cs" />
     <Compile Include="Models\Board.cs" />
+    <Compile Include="Models\DangerTile.cs" />
+    <Compile Include="Models\Delta.cs" />
+    <Compile Include="Models\EmptyTile.cs" />
+    <Compile Include="Models\MinedTile.cs" />
     <Compile Include="Models\Tile.cs" />
-    <Compile Include="Models\VisibilityLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

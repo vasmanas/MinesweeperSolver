@@ -5,7 +5,7 @@ using MinesweeperSolver.GameSimulator.Models;
 namespace MinesweeperSolver.GameSimulator.Tests
 {
     [TestClass]
-    public class MineGeneratorTests
+    public class BoardGeneratorServiceTests
     {
         private const string Category = "MineGenerator";
 
@@ -13,14 +13,13 @@ namespace MinesweeperSolver.GameSimulator.Tests
         [TestCategory(Category)]
         public void Generate_Single_Mine()
         {
-            var board = new Board(1, 1);
-            var generator = new MineGenerator();
+            var generator = new BoardGeneratorService();
 
-            Assert.IsNull(board.Tiles[0, 0]);
+            var tiles = generator.Generate(1, 1, 1);
 
-            generator.Fill(board, 1);
-
-            Assert.IsTrue(board.Tiles[0, 0].IsMine);
+            Assert.AreEqual(1, tiles.GetLength(0));
+            Assert.AreEqual(1, tiles.GetLength(1));
+            Assert.IsTrue(tiles[0, 0]);
         }
 
         [TestMethod]
@@ -29,18 +28,17 @@ namespace MinesweeperSolver.GameSimulator.Tests
         {
             const int MineCount = 10;
 
-            var board = new Board(9, 9);
-            var generator = new MineGenerator();
+            var generator = new BoardGeneratorService();
 
-            generator.Fill(board, MineCount);
+            var tiles = generator.Generate(9, 9, MineCount);
 
             var emptyTileCount = 0;
             var minedTileCount = 0;
-            for (int i = 0; i < board.Width; i++)
+            for (int i = 0; i < tiles.GetLength(0); i++)
             {
-                for (int j = 0; j < board.Height; j++)
+                for (int j = 0; j < tiles.GetLength(1); j++)
                 {
-                    if (board.Tiles[i, j].IsMine)
+                    if (tiles[i, j])
                     {
                         minedTileCount++;
                     }
@@ -52,7 +50,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             }
 
             Assert.AreEqual(MineCount, minedTileCount);
-            Assert.AreEqual((board.Width * board.Height) - MineCount, emptyTileCount);
+            Assert.AreEqual((tiles.GetLength(0) * tiles.GetLength(1)) - MineCount, emptyTileCount);
         }
     }
 }

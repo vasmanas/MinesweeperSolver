@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MinesweeperSolver.GameSimulator.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -6,105 +7,54 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
 {
     public class TileViewModel : INotifyPropertyChanged
     {
-        private bool _covered = true;
-        private bool _flag = false;
-        private byte _count = 0;
-        private bool _mine = false;
-        private readonly List<TileViewModel> _neighbours = new List<TileViewModel>();
-        private readonly GameProgress _progress;
+        private readonly Board _borad;
+        private readonly int _x;
+        private readonly int _y;
 
-        public TileViewModel(GameProgress progress)
+        public TileViewModel(Board borad, int x, int y)
         {
-            _mine = true;
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
+            this._borad = borad;
+            this._x = x;
+            this._y = y;
+
+            //_borad.IsCovered(x, y);
+            //_borad.IsFlagged(x, y);
         }
 
-        public TileViewModel(GameProgress progress, byte surroundingBombCount)
-        {
-            if (surroundingBombCount < 0 || surroundingBombCount > 8)
-            {
-                throw new ArgumentOutOfRangeException(nameof(surroundingBombCount));
-            }
-
-            _count = surroundingBombCount;
-            _progress = progress ?? throw new ArgumentNullException(nameof(progress));
-        }
-
-        public bool Hidden { get { return _covered && !_flag; } }
-        public bool Flagged { get { return _covered && _flag; } }
-        public bool Uncovered { get { return !_covered && !_mine; } }
-        public string Count { get { return _count == 0 ? string.Empty : _count.ToString(); } }
-        public bool Blew { get { return !_covered && _mine; } }
+        public bool Hidden { get { return _borad.IsCovered(_x, _y) && !_borad.IsFlagged(_x, _y); } }
+        public bool Flagged { get { return _borad.IsCovered(_x, _y) && _borad.IsFlagged(_x, _y); } }
+        public bool Uncovered { get { return !_borad.IsCovered(_x, _y) && _borad.IsMine(_x, _y).HasValue && !_borad.IsMine(_x, _y).Value; } }
+        public bool Blew { get { return !_borad.IsCovered(_x, _y) && _borad.IsMine(_x, _y).HasValue && _borad.IsMine(_x, _y).Value; } }
+        public string Count { get { return (_borad.SurroundingMineCount(_x, _y) ?? 0) == 0 ? string.Empty : _borad.SurroundingMineCount(_x, _y).Value.ToString(); } }
 
         public void Open()
         {
-            if (!this._covered)
+            if (!_borad.IsCovered(_x, _y))
             {
                 return;
             }
 
-            this._covered = false;
+            // TOOD: jei atsidare tuscias tai atidaryti ir kaimynus
+            _borad.OpenTile(_x, _y);
 
             this.NotifyPropertyChanged("Hidden");
             this.NotifyPropertyChanged("Flagged");
             this.NotifyPropertyChanged("Uncovered");
             this.NotifyPropertyChanged("Blew");
-
-            if (_mine)
-            {
-                _progress.Lost();
-
-                return;
-            }
-
-            _progress.OpenTile();
-
-            if (_count > 0)
-            {
-                return;
-            }
-
-            foreach (var neighbour in _neighbours)
-            {
-                neighbour.Open();
-            }
+            this.NotifyPropertyChanged("Count");
         }
 
         public void Flag()
         {
-            if (!this._covered)
+            if (!_borad.IsCovered(_x, _y))
             {
                 return;
             }
 
-            if (_flag)
-            {
-                _progress.RemoveFlag(_mine);
-            }
-            else
-            {
-                _progress.PlaceFlag(_mine);
-            }
-
-            this._flag = !this._flag;
+            _borad.Flag(_x, _y);
 
             this.NotifyPropertyChanged("Hidden");
             this.NotifyPropertyChanged("Flagged");
-        }
-
-        public void Addneighbour(TileViewModel neighbour)
-        {
-            if (neighbour == null)
-            {
-                throw new ArgumentNullException(nameof(neighbour));
-            }
-
-            if (_mine)
-            {
-                return;
-            }
-
-            this._neighbours.Add(neighbour);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

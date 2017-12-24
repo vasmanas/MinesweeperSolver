@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MinesweeperSolver.GameSimulator.Models;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,83 +18,124 @@ namespace MinesweeperSolver.GameSimulator.Tests
         [TestCategory(Category)]
         public void Board_1x1_With_Mine()
         {
-            var board = new Board(1, 1);
-            board.Tiles[0, 0] = new Tile(true);
+            var tiles = new bool[,] { { true } };
 
-            Assert.IsTrue(board.IsMineAt(0, 0));            
+            var generator = Substitute.For<IBoardGeneratorService>();
+            generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
+
+            var blew = false;
+            var board = new Board(1, 1, 1, generator, () => blew = true);
+            board.OpenTile(0, 0);
+
+            Assert.IsTrue(blew);
         }
 
         [TestMethod]
         [TestCategory(Category)]
         public void Board_1x1_Without_Mine()
         {
-            var board = new Board(1, 1);
-            board.Tiles[0, 0] = new Tile(false);
+            var tiles = new bool[,] { { false } };
 
-            Assert.IsFalse(board.IsMineAt(0, 0));
+            var generator = Substitute.For<IBoardGeneratorService>();
+            generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
+
+            var blew = false;
+            var board = new Board(1, 1, 1, generator, () => blew = true);
+            board.OpenTile(0, 0);
+
+            Assert.IsFalse(blew);
         }
 
         [TestMethod]
         [TestCategory(Category)]
         public void Board_1x1_Out_Of_Bounds()
         {
-            var board = new Board(1, 1);
-            board.Tiles[0, 0] = new Tile(false);
+            var tiles = new bool[,] { { false } };
 
-            Assert.IsFalse(board.IsMineAt(-1, -1));
-            Assert.IsFalse(board.IsMineAt(-1, 0));
-            Assert.IsFalse(board.IsMineAt(-1, 1));
-            Assert.IsFalse(board.IsMineAt(0, -1));
-            Assert.IsFalse(board.IsMineAt(0, 1));
-            Assert.IsFalse(board.IsMineAt(1, -1));
-            Assert.IsFalse(board.IsMineAt(1, 0));
-            Assert.IsFalse(board.IsMineAt(1, 1));
+            var generator = Substitute.For<IBoardGeneratorService>();
+            generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
+
+            var board = new Board(1, 1, 1, generator, () => { });
+
+            Assert.IsFalse(board.IsInBoard(-1, -1));
+            Assert.IsFalse(board.IsInBoard(-1, 0));
+            Assert.IsFalse(board.IsInBoard(-1, 1));
+            Assert.IsFalse(board.IsInBoard(0, -1));
+            Assert.IsFalse(board.IsInBoard(0, 1));
+            Assert.IsFalse(board.IsInBoard(1, -1));
+            Assert.IsFalse(board.IsInBoard(1, 0));
+            Assert.IsFalse(board.IsInBoard(1, 1));
+        }
+
+        //[TestMethod]
+        //[TestCategory(Category)]
+        //public void Board_1x1_Count_Mines_No_Mines()
+        //{
+        //    var tiles = new bool[,] { { false } };
+
+        //    var generator = Substitute.For<IBoardGeneratorService>();
+        //    generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
+
+        //    var blew = false;
+        //    var board = new Board(1, 1, 1, generator, () => blew = true);
+
+        //    Assert.AreEqual(0, board.SuroundingMines(0, 0));
+        //}
+
+        [TestMethod]
+        [TestCategory(Category)]
+        public void Board_3x3_Count_Mines_No_Mines()
+        {
+            var tiles = new bool[,]
+            {
+                { false, false, false },
+                { false, true, false },
+                { false, false, false }
+            };
+
+            var generator = Substitute.For<IBoardGeneratorService>();
+            generator.Generate(3, 3, 9).Returns(tiles);
+
+            var blew = false;
+            var board = new Board(3, 3, 9, generator, () => blew = true);
+
+            board.OpenTile(0, 0);
+            Assert.IsFalse(blew);
+            board.OpenTile(0, 1);
+            Assert.IsFalse(blew);
+            board.OpenTile(0, 2);
+            Assert.IsFalse(blew);
+            board.OpenTile(1, 0);
+            Assert.IsFalse(blew);
+            board.OpenTile(1, 2);
+            Assert.IsFalse(blew);
+            board.OpenTile(2, 0);
+            Assert.IsFalse(blew);
+            board.OpenTile(2, 1);
+            Assert.IsFalse(blew);
+            board.OpenTile(2, 2);
+            Assert.IsFalse(blew);
         }
 
         [TestMethod]
         [TestCategory(Category)]
-        public void Board_1x1_Count_Mines_No_Mines()
+        public void Board_3x3_Count_Mines_All_Mines()
         {
-            var board = new Board(1, 1);
-            board.Tiles[0, 0] = new Tile(false);
+            var tiles = new bool[,]
+            {
+                { true, true, true },
+                { true, false, true },
+                { true, true, true }
+            };
 
-            Assert.AreEqual(0, board.SuroundingMines(0, 0));
-        }
+            var generator = Substitute.For<IBoardGeneratorService>();
+            generator.Generate(3, 3, 9).Returns(tiles);
 
-        [TestMethod]
-        [TestCategory(Category)]
-        public void Board_9x9_Count_Mines_No_Mines()
-        {
-            var board = new Board(3, 3);
-            board.Tiles[0, 1] = new Tile(false);
-            board.Tiles[0, 2] = new Tile(false);
-            board.Tiles[1, 0] = new Tile(false);
-            board.Tiles[0, 0] = new Tile(false);
-            board.Tiles[1, 1] = new Tile(false);
-            board.Tiles[1, 2] = new Tile(false);
-            board.Tiles[2, 0] = new Tile(false);
-            board.Tiles[2, 1] = new Tile(false);
-            board.Tiles[2, 2] = new Tile(false);
+            var blew = false;
+            var board = new Board(3, 3, 9, generator, () => blew = true);
 
-            Assert.AreEqual(0, board.SuroundingMines(1, 1));
-        }
-
-        [TestMethod]
-        [TestCategory(Category)]
-        public void Board_9x9_Count_Mines_All_Mines()
-        {
-            var board = new Board(3, 3);
-            board.Tiles[0, 0] = new Tile(true);
-            board.Tiles[0, 1] = new Tile(true);
-            board.Tiles[0, 2] = new Tile(true);
-            board.Tiles[1, 0] = new Tile(true);
-            board.Tiles[1, 1] = new Tile(true);
-            board.Tiles[1, 2] = new Tile(true);
-            board.Tiles[2, 0] = new Tile(true);
-            board.Tiles[2, 1] = new Tile(true);
-            board.Tiles[2, 2] = new Tile(true);
-                                         
-            Assert.AreEqual(8, board.SuroundingMines(1, 1));
+            board.OpenTile(1, 1);
+            Assert.IsFalse(blew);
         }
     }
 }
