@@ -1,6 +1,4 @@
 ﻿using MinesweeperSolver.GameSimulator.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace MinesweeperSolver.DesctopApplication.ViewModels
@@ -16,9 +14,6 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
             this._borad = borad;
             this._x = x;
             this._y = y;
-
-            //_borad.IsCovered(x, y);
-            //_borad.IsFlagged(x, y);
         }
 
         public bool Hidden { get { return _borad.IsCovered(_x, _y) && !_borad.IsFlagged(_x, _y); } }
@@ -34,14 +29,9 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
                 return;
             }
 
-            // TOOD: jei atsidare tuscias tai atidaryti ir kaimynus
             _borad.OpenTile(_x, _y);
 
-            this.NotifyPropertyChanged("Hidden");
-            this.NotifyPropertyChanged("Flagged");
-            this.NotifyPropertyChanged("Uncovered");
-            this.NotifyPropertyChanged("Blew");
-            this.NotifyPropertyChanged("Count");
+            NotifyUncovering();
         }
 
         public void Flag()
@@ -53,6 +43,20 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
 
             _borad.Flag(_x, _y);
 
+            NotifyFlagging();
+        }
+
+        public void NotifyUncovering()
+        {
+            NotifyFlagging();
+
+            this.NotifyPropertyChanged("Uncovered");
+            this.NotifyPropertyChanged("Count");
+            this.NotifyPropertyChanged("Blew");
+        }
+
+        private void NotifyFlagging()
+        {
             this.NotifyPropertyChanged("Hidden");
             this.NotifyPropertyChanged("Flagged");
         }
