@@ -82,7 +82,14 @@ namespace MinesweeperSolver.DesctopApplication
             MineField.Height = RowHeight * rowCount;
 
             var generator = new BoardGeneratorService();
-            var board = new Board(colCount, rowCount, mineCount, generator, () => { /* TODO: blow */ }, (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering());
+            var board =
+                new Board(
+                    colCount,
+                    rowCount,
+                    mineCount,
+                    generator,
+                    () => { /* TODO: blow */ },
+                    (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering());
 
             var viewTiles = new MinesweeperTile[colCount, rowCount];
 

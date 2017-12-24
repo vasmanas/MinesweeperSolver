@@ -102,6 +102,8 @@ namespace MinesweeperSolver.GameSimulator.Models
                 return;
             }
 
+            // TODO: Calc statistics
+
             _tiles[x, y].Flag();
         }
 
@@ -123,6 +125,8 @@ namespace MinesweeperSolver.GameSimulator.Models
             }
 
             _tiles[x, y].Open();
+
+            // TODO: Calc statistics
 
             _postOpen(x, y);
         }
