@@ -26,11 +26,5 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private string Statistics()
-        {
-            return $"{State}";
-            //return $"{State};CF:{CorrectFlags};IF:{IncorrectFlags};NF:{NotUsedFlags};OT:{OpenTiles};CT:{CoveredTiles}";
-        }
     }
 }

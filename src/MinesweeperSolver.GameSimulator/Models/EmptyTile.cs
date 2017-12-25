@@ -6,7 +6,7 @@ namespace MinesweeperSolver.GameSimulator.Models
     {
         private readonly Action _openNeighbors;
 
-        public EmptyTile(Action openNeighbors) : base(false)
+        public EmptyTile(Action openNeighbors, EndGameTracker endGameTracker) : base(false, endGameTracker)
         {
             _openNeighbors = openNeighbors;
         }

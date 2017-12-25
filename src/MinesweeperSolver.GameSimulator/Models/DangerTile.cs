@@ -6,7 +6,7 @@ namespace MinesweeperSolver.GameSimulator.Models
     {
         private byte _nearbyMines;
 
-        public DangerTile(byte nearbyMines) : base(false)
+        public DangerTile(byte nearbyMines, EndGameTracker endGameTracker) : base(false, endGameTracker)
         {
             if (nearbyMines < 1 || nearbyMines > 8)
             {

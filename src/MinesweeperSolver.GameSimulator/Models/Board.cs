@@ -69,7 +69,7 @@ namespace MinesweeperSolver.GameSimulator.Models
                 {
                     if (mines[i, j])
                     {
-                        _tiles[i, j] = new MinedTile(() => { _endGameTracker.Lost(); blow(); });
+                        _tiles[i, j] = new MinedTile(() => { _endGameTracker.Lost(); blow(); }, _endGameTracker);
                     }
                     else
                     {
@@ -77,14 +77,14 @@ namespace MinesweeperSolver.GameSimulator.Models
 
                         if (cnt > 0)
                         {
-                            _tiles[i, j] = new DangerTile((byte)cnt);
+                            _tiles[i, j] = new DangerTile((byte)cnt, _endGameTracker);
                         }
                         else
                         {
                             var cx = i;
                             var cy = j;
 
-                            _tiles[i, j] = new EmptyTile(() => this.IterateNeighbors(cx, cy, (x, y) => this.OpenTile(x, y)));
+                            _tiles[i, j] = new EmptyTile(() => this.IterateNeighbors(cx, cy, (x, y) => this.OpenTile(x, y)), _endGameTracker);
                         }
                     }
                 }
@@ -130,8 +130,6 @@ namespace MinesweeperSolver.GameSimulator.Models
             }
 
             _tiles[x, y].Open();
-
-            _endGameTracker.OpenTile();
 
             _postOpen(x, y);
         }

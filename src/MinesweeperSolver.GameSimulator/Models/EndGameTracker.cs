@@ -32,9 +32,7 @@ namespace MinesweeperSolver.GameSimulator.Models
             {
                 this.State = State.Won;
 
-                //this.NotifyPropertyChanged("State");
-
-                _endGame("Y"/*Statistics()*/);
+                _endGame(Statistics());
             }
         }
 
@@ -42,7 +40,12 @@ namespace MinesweeperSolver.GameSimulator.Models
         {
             this.State = State.Lost;
 
-            _endGame("X"/*Statistics()*/);
+            _endGame(Statistics());
+        }
+
+        private string Statistics()
+        {
+            return $"{State};CF:/*CorrectFlags*/;IF:/*IncorrectFlags*/;NF:{NotUsedFlags};OT:{OpenTiles};CT:{CoveredTiles}";
         }
 
         //public void PlaceFlag(bool correct)

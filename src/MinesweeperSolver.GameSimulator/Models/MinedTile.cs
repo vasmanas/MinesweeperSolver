@@ -6,7 +6,7 @@ namespace MinesweeperSolver.GameSimulator.Models
     {
         private readonly Action _blow;
 
-        public MinedTile(Action blow) : base(true)
+        public MinedTile(Action blow, EndGameTracker endGameTracker) : base(true, endGameTracker)
         {
             this._blow = blow;
         }

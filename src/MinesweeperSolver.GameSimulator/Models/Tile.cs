@@ -3,13 +3,14 @@
     public abstract class Tile
     {
         private readonly bool _isMine;
-
+        private readonly EndGameTracker _endGameTracker;
         private bool _covered = true;
         private bool _flag = false;
 
-        protected Tile(bool isMine)
+        protected Tile(bool isMine, EndGameTracker endGameTracker)
         {
             _isMine = isMine;
+            _endGameTracker = endGameTracker;
         }
 
         public bool Mined => _isMine;
@@ -25,6 +26,8 @@
 
             _covered = false;
             _flag = false;
+
+            _endGameTracker.OpenTile();
         }
 
         public virtual void Flag()
