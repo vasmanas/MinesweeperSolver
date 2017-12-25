@@ -8,12 +8,14 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
         private readonly Board _borad;
         private readonly int _x;
         private readonly int _y;
+        private readonly GameProgress _progress;
 
-        public TileViewModel(Board borad, int x, int y)
+        public TileViewModel(Board borad, int x, int y, GameProgress progress)
         {
             this._borad = borad;
             this._x = x;
             this._y = y;
+            this._progress = progress;
         }
 
         public bool Hidden { get { return _borad.IsCovered(_x, _y) && !_borad.IsFlagged(_x, _y); } }
@@ -32,6 +34,8 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
             _borad.OpenTile(_x, _y);
 
             NotifyUncovering();
+
+            _progress.OpenTile();
         }
 
         public void Flag()

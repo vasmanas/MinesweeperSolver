@@ -46,7 +46,9 @@
     <Compile Include="Models\DangerTile.cs" />
     <Compile Include="Models\Delta.cs" />
     <Compile Include="Models\EmptyTile.cs" />
+    <Compile Include="Models\EndGameTracker.cs" />
     <Compile Include="Models\MinedTile.cs" />
+    <Compile Include="Models\State.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

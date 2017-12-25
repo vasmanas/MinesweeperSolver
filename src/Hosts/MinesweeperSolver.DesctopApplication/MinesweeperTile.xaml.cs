@@ -11,11 +11,11 @@ namespace MinesweeperSolver.DesctopApplication
     /// </summary>
     public partial class MinesweeperTile : UserControl
     {
-        public MinesweeperTile(Board board, int x, int y)
+        public MinesweeperTile(Board board, int x, int y, GameProgress progress)
         {
             InitializeComponent();
 
-            Model = new TileViewModel(board, x, y);
+            Model = new TileViewModel(board, x, y, progress);
 
             this.DataContext = Model;
         }

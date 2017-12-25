@@ -81,6 +81,14 @@ namespace MinesweeperSolver.DesctopApplication
             MineField.Width = ColumWidth * colCount;
             MineField.Height = RowHeight * rowCount;
 
+            void WonGame(string statistics)
+            {
+                //// TODO: Use
+                //OpenBoard(viewTiles, board);
+
+                Statistics.Content = statistics;
+            }
+
             var generator = new BoardGeneratorService();
             var board =
                 new Board(
@@ -89,26 +97,18 @@ namespace MinesweeperSolver.DesctopApplication
                     mineCount,
                     generator,
                     () => { /* TODO: blow */ },
-                    (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering());
+                    (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering(),
+                    WonGame);
 
             var viewTiles = new MinesweeperTile[colCount, rowCount];
 
-            //// TODO: Use
-            //void EndGame(string statistics)
-            //{
-            //    OpenBoard(viewTiles, board);
-
-            //    Statistics.Content = statistics;
-            //}
-
-            //// TODO: Use
-            //var progress = new GameProgress(colCount * rowCount, mineCount, EndGame);
+            var progress = new GameProgress(board/*colCount * rowCount, mineCount, EndGame*/);
 
             for (int i = 0; i < colCount; i++)
             {
                 for (int j = 0; j < rowCount; j++)
                 {
-                    var viewTile = new MinesweeperTile(board, i, j);
+                    var viewTile = new MinesweeperTile(board, i, j, progress);
 
                     viewTiles[i, j] = viewTile;
 

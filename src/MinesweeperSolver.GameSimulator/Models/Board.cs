@@ -23,6 +23,7 @@ namespace MinesweeperSolver.GameSimulator.Models
         /// </summary>
         private readonly Tile[,] _tiles;
         private readonly Action<int, int> _postOpen;
+        private readonly EndGameTracker _endGameTracker;
 
         public Board(
             int width,
@@ -30,7 +31,8 @@ namespace MinesweeperSolver.GameSimulator.Models
             int mineCount,
             IBoardGeneratorService generator,
             Action blow,
-            Action<int, int> postOpen)
+            Action<int, int> postOpen,
+            Action<string> wonGameAction)
         {
             if (generator == null)
             {
@@ -55,6 +57,9 @@ namespace MinesweeperSolver.GameSimulator.Models
             this._postOpen = postOpen;
             Width = width;
             Height = height;
+
+            _endGameTracker = new EndGameTracker(width * height, mineCount, wonGameAction);
+
             _tiles = new Tile[Width, Height];
             var mines = generator.Generate(Width, Height, mineCount);
 
@@ -64,7 +69,7 @@ namespace MinesweeperSolver.GameSimulator.Models
                 {
                     if (mines[i, j])
                     {
-                        _tiles[i, j] = new MinedTile(blow);
+                        _tiles[i, j] = new MinedTile(() => { _endGameTracker.Lost(); blow(); });
                     }
                     else
                     {
@@ -90,6 +95,8 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public int Height { get; }
 
+        public State EndOfGame => _endGameTracker.State;
+
         public bool IsInBoard(int x, int y)
         {
             return !(x < 0 || x > Width - 1 || y < 0 || y > Height - 1);
@@ -101,8 +108,6 @@ namespace MinesweeperSolver.GameSimulator.Models
             {
                 return;
             }
-
-            // TODO: Calc statistics
 
             _tiles[x, y].Flag();
         }
@@ -126,7 +131,7 @@ namespace MinesweeperSolver.GameSimulator.Models
 
             _tiles[x, y].Open();
 
-            // TODO: Calc statistics
+            _endGameTracker.OpenTile();
 
             _postOpen(x, y);
         }

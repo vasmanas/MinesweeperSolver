@@ -24,7 +24,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
             var blew = false;
-            var board = new Board(1, 1, 1, generator, () => blew = true);
+            var board = new Board(1, 1, 1, generator, () => blew = true, (x, y) => { }, s => { });
             board.OpenTile(0, 0);
 
             Assert.IsTrue(blew);
@@ -40,7 +40,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
             var blew = false;
-            var board = new Board(1, 1, 1, generator, () => blew = true);
+            var board = new Board(1, 1, 1, generator, () => blew = true, (x, y) => { }, s => { });
             board.OpenTile(0, 0);
 
             Assert.IsFalse(blew);
@@ -55,7 +55,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
-            var board = new Board(1, 1, 1, generator, () => { });
+            var board = new Board(1, 1, 1, generator, () => { }, (x, y) => { }, s => { });
 
             Assert.IsFalse(board.IsInBoard(-1, -1));
             Assert.IsFalse(board.IsInBoard(-1, 0));
@@ -97,7 +97,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             generator.Generate(3, 3, 9).Returns(tiles);
 
             var blew = false;
-            var board = new Board(3, 3, 9, generator, () => blew = true);
+            var board = new Board(3, 3, 9, generator, () => blew = true, (x, y) => { }, s => { });
 
             board.OpenTile(0, 0);
             Assert.IsFalse(blew);
@@ -132,7 +132,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             generator.Generate(3, 3, 9).Returns(tiles);
 
             var blew = false;
-            var board = new Board(3, 3, 9, generator, () => blew = true);
+            var board = new Board(3, 3, 9, generator, () => blew = true, (x, y) => { }, s => { });
 
             board.OpenTile(1, 1);
             Assert.IsFalse(blew);
