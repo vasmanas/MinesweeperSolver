@@ -23,11 +23,10 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
-            var blew = false;
-            var board = new Board(1, 1, 1, generator, () => blew = true, (x, y) => { }, s => { });
+            var board = new Board(1, 1, 1, generator, (x, y) => { }, s => { });
             board.OpenTile(0, 0);
 
-            Assert.IsTrue(blew);
+            Assert.AreEqual(State.Lost, board.EndOfGame);
         }
 
         [TestMethod]
@@ -37,13 +36,12 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var tiles = new bool[,] { { false } };
 
             var generator = Substitute.For<IBoardGeneratorService>();
-            generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
+            generator.Generate(1, 1, 0).Returns(tiles);
 
-            var blew = false;
-            var board = new Board(1, 1, 1, generator, () => blew = true, (x, y) => { }, s => { });
+            var board = new Board(1, 1, 0, generator, (x, y) => { }, s => { });
             board.OpenTile(0, 0);
 
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Won, board.EndOfGame);
         }
 
         [TestMethod]
@@ -55,7 +53,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
-            var board = new Board(1, 1, 1, generator, () => { }, (x, y) => { }, s => { });
+            var board = new Board(1, 1, 1, generator, (x, y) => { }, s => { });
 
             Assert.IsFalse(board.IsInBoard(-1, -1));
             Assert.IsFalse(board.IsInBoard(-1, 0));
@@ -67,20 +65,21 @@ namespace MinesweeperSolver.GameSimulator.Tests
             Assert.IsFalse(board.IsInBoard(1, 1));
         }
 
-        //[TestMethod]
-        //[TestCategory(Category)]
-        //public void Board_1x1_Count_Mines_No_Mines()
-        //{
-        //    var tiles = new bool[,] { { false } };
+        [TestMethod]
+        [TestCategory(Category)]
+        public void Board_1x1_Count_Mines_No_Mines()
+        {
+            var tiles = new bool[,] { { false } };
 
-        //    var generator = Substitute.For<IBoardGeneratorService>();
-        //    generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
+            var generator = Substitute.For<IBoardGeneratorService>();
+            generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
-        //    var blew = false;
-        //    var board = new Board(1, 1, 1, generator, () => blew = true);
+            var board = new Board(1, 1, 1, generator, (x, y) => { }, s => { });
+            board.OpenTile(0, 0);
 
-        //    Assert.AreEqual(0, board.SuroundingMines(0, 0));
-        //}
+
+            Assert.AreEqual(0, board.SurroundingMineCount(0, 0));
+        }
 
         [TestMethod]
         [TestCategory(Category)]
@@ -96,25 +95,24 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(3, 3, 9).Returns(tiles);
 
-            var blew = false;
-            var board = new Board(3, 3, 9, generator, () => blew = true, (x, y) => { }, s => { });
+            var board = new Board(3, 3, 9, generator, (x, y) => { }, s => { });
 
             board.OpenTile(0, 0);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
             board.OpenTile(0, 1);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
             board.OpenTile(0, 2);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
             board.OpenTile(1, 0);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
             board.OpenTile(1, 2);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
             board.OpenTile(2, 0);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
             board.OpenTile(2, 1);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
             board.OpenTile(2, 2);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Playing, board.EndOfGame);
         }
 
         [TestMethod]
@@ -129,13 +127,12 @@ namespace MinesweeperSolver.GameSimulator.Tests
             };
 
             var generator = Substitute.For<IBoardGeneratorService>();
-            generator.Generate(3, 3, 9).Returns(tiles);
+            generator.Generate(3, 3, 8).Returns(tiles);
 
-            var blew = false;
-            var board = new Board(3, 3, 9, generator, () => blew = true, (x, y) => { }, s => { });
+            var board = new Board(3, 3, 8, generator, (x, y) => { }, s => { });
 
             board.OpenTile(1, 1);
-            Assert.IsFalse(blew);
+            Assert.AreEqual(State.Won, board.EndOfGame);
         }
     }
 }

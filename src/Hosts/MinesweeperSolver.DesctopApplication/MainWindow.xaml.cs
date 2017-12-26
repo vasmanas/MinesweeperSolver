@@ -96,7 +96,6 @@ namespace MinesweeperSolver.DesctopApplication
                     rowCount,
                     mineCount,
                     generator,
-                    () => { /* TODO: blow */ },
                     (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering(),
                     WonGame);
 

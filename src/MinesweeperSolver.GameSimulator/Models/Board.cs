@@ -30,7 +30,6 @@ namespace MinesweeperSolver.GameSimulator.Models
             int height,
             int mineCount,
             IBoardGeneratorService generator,
-            Action blow,
             Action<int, int> postOpen,
             Action<string> wonGameAction)
         {
@@ -69,7 +68,7 @@ namespace MinesweeperSolver.GameSimulator.Models
                 {
                     if (mines[i, j])
                     {
-                        _tiles[i, j] = new MinedTile(() => { _endGameTracker.Lost(); blow(); }, _endGameTracker);
+                        _tiles[i, j] = new MinedTile(_endGameTracker);
                     }
                     else
                     {
@@ -109,6 +108,11 @@ namespace MinesweeperSolver.GameSimulator.Models
                 return;
             }
 
+            if (_endGameTracker.IsFinished())
+            {
+                return;
+            }
+
             _tiles[x, y].Flag();
         }
 
@@ -125,6 +129,11 @@ namespace MinesweeperSolver.GameSimulator.Models
         public void OpenTile(int x, int y)
         {
             if (!IsInBoard(x, y))
+            {
+                return;
+            }
+
+            if (_endGameTracker.IsFinished())
             {
                 return;
             }
@@ -151,11 +160,6 @@ namespace MinesweeperSolver.GameSimulator.Models
                 return null;
             }
 
-            if (IsCovered(x, y))
-            {
-                return null;
-            }
-
             return _tiles[x, y].Mined;
         }
 
@@ -164,6 +168,11 @@ namespace MinesweeperSolver.GameSimulator.Models
         /// </summary>
         public int? SurroundingMineCount(int x, int y)
         {
+            if (_endGameTracker.IsFinished())
+            {
+                return null;
+            }
+
             if (!IsInBoard(x, y))
             {
                 return null;
@@ -174,14 +183,14 @@ namespace MinesweeperSolver.GameSimulator.Models
                 return null;
             }
 
-            if (_tiles[x, y] is DangerTile)
-            {
-                return (_tiles[x, y] as DangerTile).NearbyMines;
-            }
-
             if (_tiles[x, y] is EmptyTile)
             {
                 return 0;
+            }
+
+            if (_tiles[x, y] is DangerTile)
+            {
+                return (_tiles[x, y] as DangerTile).NearbyMines;
             }
 
             return null;

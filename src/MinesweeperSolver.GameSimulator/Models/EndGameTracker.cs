@@ -19,8 +19,8 @@ namespace MinesweeperSolver.GameSimulator.Models
         public int OpenTiles { get; private set; }
         public int CoveredTiles { get; private set; }
 
-        //public int CorrectFlags { get; private set; }
-        //public int IncorrectFlags { get; private set; }
+        public int CorrectFlags { get; private set; }
+        public int IncorrectFlags { get; private set; }
         public int NotUsedFlags { get; private set; }
 
         public void OpenTile()
@@ -43,37 +43,42 @@ namespace MinesweeperSolver.GameSimulator.Models
             _endGame(Statistics());
         }
 
-        private string Statistics()
+        public bool IsFinished()
         {
-            return $"{State};CF:/*CorrectFlags*/;IF:/*IncorrectFlags*/;NF:{NotUsedFlags};OT:{OpenTiles};CT:{CoveredTiles}";
+            return State != State.Playing;
         }
 
-        //public void PlaceFlag(bool correct)
-        //{
-        //    this.NotUsedFlags--;
+        private string Statistics()
+        {
+            return $"{State};CF:{CorrectFlags};IF:{IncorrectFlags};NF:{NotUsedFlags};OT:{OpenTiles};CT:{CoveredTiles}";
+        }
 
-        //    if (correct)
-        //    {
-        //        this.CorrectFlags++;
-        //    }
-        //    else
-        //    {
-        //        this.IncorrectFlags++;
-        //    }
-        //}
+        public void PlaceFlag(bool correct)
+        {
+            this.NotUsedFlags--;
 
-        //public void RemoveFlag(bool correct)
-        //{
-        //    this.NotUsedFlags++;
+            if (correct)
+            {
+                this.CorrectFlags++;
+            }
+            else
+            {
+                this.IncorrectFlags++;
+            }
+        }
 
-        //    if (correct)
-        //    {
-        //        this.CorrectFlags--;
-        //    }
-        //    else
-        //    {
-        //        this.IncorrectFlags--;
-        //    }
-        //}
+        public void RemoveFlag(bool correct)
+        {
+            this.NotUsedFlags++;
+
+            if (correct)
+            {
+                this.CorrectFlags--;
+            }
+            else
+            {
+                this.IncorrectFlags--;
+            }
+        }
     }
 }

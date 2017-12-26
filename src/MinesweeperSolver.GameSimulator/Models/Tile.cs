@@ -3,17 +3,17 @@
     public abstract class Tile
     {
         private readonly bool _isMine;
-        private readonly EndGameTracker _endGameTracker;
         private bool _covered = true;
         private bool _flag = false;
 
         protected Tile(bool isMine, EndGameTracker endGameTracker)
         {
             _isMine = isMine;
-            _endGameTracker = endGameTracker;
+            Tracker = endGameTracker;
         }
 
-        public bool Mined => _isMine;
+        protected EndGameTracker Tracker { get; private set; }
+        public bool? Mined => _covered ? (bool?)null : _isMine;
         public bool Covered => _covered;
         public bool Flagged => _flag;
 
@@ -24,10 +24,16 @@
                 return;
             }
 
-            _covered = false;
-            _flag = false;
+            if (_flag)
+            {
+                Tracker.RemoveFlag(false);
 
-            _endGameTracker.OpenTile();
+                _flag = false;
+            }
+
+            _covered = false;
+
+            Tracker.OpenTile();
         }
 
         public virtual void Flag()
@@ -37,7 +43,18 @@
                 return;
             }
 
-            _flag = !_flag;
+            if (_flag)
+            {
+                Tracker.RemoveFlag(_isMine);
+
+                _flag = false;
+            }
+            else
+            {
+                Tracker.PlaceFlag(_isMine);
+
+                _flag = true;
+            }
         }
     }
 }
