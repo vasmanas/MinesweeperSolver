@@ -22,15 +22,13 @@ namespace MinesweeperSolver.GameSimulator.Models
         /// Starts at (0,0).
         /// </summary>
         private readonly Tile[,] _tiles;
-        private readonly Action<int, int> _postOpen;
         private readonly EndGameTracker _endGameTracker;
 
         public Board(
             int width,
             int height,
             int mineCount,
-            IBoardGeneratorService generator,
-            Action<int, int> postOpen)
+            IBoardGeneratorService generator)
         {
             if (generator == null)
             {
@@ -52,7 +50,6 @@ namespace MinesweeperSolver.GameSimulator.Models
                 throw new ArgumentOutOfRangeException(nameof(mineCount), "Mine count myt be between 1 and width * height");
             }
 
-            this._postOpen = postOpen;
             Width = width;
             Height = height;
 
@@ -153,8 +150,6 @@ namespace MinesweeperSolver.GameSimulator.Models
             }
 
             _tiles[x, y].Open();
-
-            _postOpen(x, y);
         }
 
         public virtual bool IsCovered(int x, int y)

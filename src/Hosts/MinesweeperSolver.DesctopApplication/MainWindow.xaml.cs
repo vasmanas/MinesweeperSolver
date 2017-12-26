@@ -83,7 +83,7 @@ namespace MinesweeperSolver.DesctopApplication
 
             var generator = new BoardGeneratorService();
             var board =
-                new Board(
+                new BoardViewModel(
                     colCount,
                     rowCount,
                     mineCount,

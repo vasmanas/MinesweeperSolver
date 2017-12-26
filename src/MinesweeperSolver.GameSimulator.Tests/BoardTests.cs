@@ -23,7 +23,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
-            var board = new Board(1, 1, 1, generator, (x, y) => { });
+            var board = new Board(1, 1, 1, generator);
             board.OpenTile(0, 0);
 
             Assert.AreEqual(State.Lost, board.EndOfGame);
@@ -38,7 +38,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(1, 1, 0).Returns(tiles);
 
-            var board = new Board(1, 1, 0, generator, (x, y) => { });
+            var board = new Board(1, 1, 0, generator);
             board.OpenTile(0, 0);
 
             Assert.AreEqual(State.Won, board.EndOfGame);
@@ -53,7 +53,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
-            var board = new Board(1, 1, 1, generator, (x, y) => { });
+            var board = new Board(1, 1, 1, generator);
 
             Assert.IsFalse(board.IsInBoard(-1, -1));
             Assert.IsFalse(board.IsInBoard(-1, 0));
@@ -74,7 +74,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>()).Returns(tiles);
 
-            var board = new Board(1, 1, 1, generator, (x, y) => { });
+            var board = new Board(1, 1, 1, generator);
             board.OpenTile(0, 0);
 
 
@@ -95,7 +95,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(3, 3, 9).Returns(tiles);
 
-            var board = new Board(3, 3, 9, generator, (x, y) => { });
+            var board = new Board(3, 3, 9, generator);
 
             board.OpenTile(0, 0);
             Assert.AreEqual(State.Playing, board.EndOfGame);
@@ -129,7 +129,7 @@ namespace MinesweeperSolver.GameSimulator.Tests
             var generator = Substitute.For<IBoardGeneratorService>();
             generator.Generate(3, 3, 8).Returns(tiles);
 
-            var board = new Board(3, 3, 8, generator, (x, y) => { });
+            var board = new Board(3, 3, 8, generator);
 
             board.OpenTile(1, 1);
             Assert.AreEqual(State.Won, board.EndOfGame);
