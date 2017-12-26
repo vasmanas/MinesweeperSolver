@@ -21,7 +21,7 @@ namespace MinesweeperSolver.DesctopApplication.ViewModels
         {
             this.NotifyPropertyChanged("State");
 
-            _reportStatus(_board.Statistics);
+            _reportStatus(_board.EndOfGameStatistics);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

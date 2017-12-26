@@ -92,7 +92,7 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public State EndOfGame => _endGameTracker.State;
 
-        public string Statistics
+        public string EndOfGameStatistics
         {
             get
             {
