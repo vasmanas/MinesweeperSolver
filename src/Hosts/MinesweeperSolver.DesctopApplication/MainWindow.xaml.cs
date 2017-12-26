@@ -81,14 +81,6 @@ namespace MinesweeperSolver.DesctopApplication
             MineField.Width = ColumWidth * colCount;
             MineField.Height = RowHeight * rowCount;
 
-            void WonGame(string statistics)
-            {
-                //// TODO: Use
-                //OpenBoard(viewTiles, board);
-
-                Statistics.Content = statistics;
-            }
-
             var generator = new BoardGeneratorService();
             var board =
                 new Board(
@@ -96,12 +88,11 @@ namespace MinesweeperSolver.DesctopApplication
                     rowCount,
                     mineCount,
                     generator,
-                    (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering(),
-                    WonGame);
+                    (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering());
 
             var viewTiles = new MinesweeperTile[colCount, rowCount];
 
-            var progress = new GameProgress(board/*colCount * rowCount, mineCount, EndGame*/);
+            var progress = new GameProgress(board, s => Statistics.Content = s);
 
             for (int i = 0; i < colCount; i++)
             {
@@ -131,35 +122,6 @@ namespace MinesweeperSolver.DesctopApplication
 
             return null;
         }
-
-        //private void OpenBoard(MinesweeperTile[,] viewTiles, Board board)
-        //{
-        //    var colCount = viewTiles.GetLength(0);
-        //    var rowCount = viewTiles.GetLength(1);
-
-        //    for (int i = 0; i < colCount; i++)
-        //    {
-        //        for (int j = 0; j < rowCount; j++)
-        //        {
-        //            var vm = viewTiles[i, j].Model;
-
-        //            if (board.IsMineAt(i, j))
-        //            {
-        //                if (vm.Hidden)
-        //                {
-        //                    vm.Flag();
-        //                }
-        //            }
-        //            else
-        //            {
-        //                if (!vm.Uncovered)
-        //                {
-        //                    vm.Open();
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
 
         private bool IsPositiveInteger(string text)
         {

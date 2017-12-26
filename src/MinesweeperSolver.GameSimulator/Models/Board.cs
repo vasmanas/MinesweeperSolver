@@ -30,8 +30,7 @@ namespace MinesweeperSolver.GameSimulator.Models
             int height,
             int mineCount,
             IBoardGeneratorService generator,
-            Action<int, int> postOpen,
-            Action<string> wonGameAction)
+            Action<int, int> postOpen)
         {
             if (generator == null)
             {
@@ -57,7 +56,7 @@ namespace MinesweeperSolver.GameSimulator.Models
             Width = width;
             Height = height;
 
-            _endGameTracker = new EndGameTracker(width * height, mineCount, wonGameAction);
+            _endGameTracker = new EndGameTracker(width * height, mineCount);
 
             _tiles = new Tile[Width, Height];
             var mines = generator.Generate(Width, Height, mineCount);
@@ -96,12 +95,27 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public State EndOfGame => _endGameTracker.State;
 
-        public bool IsInBoard(int x, int y)
+        public string Statistics
+        {
+            get
+            {
+                if (_endGameTracker.IsFinished())
+                {
+                    return $"{_endGameTracker.State};CF:{_endGameTracker.CorrectFlags};IF:{_endGameTracker.IncorrectFlags};NF:{_endGameTracker.NotUsedFlags};OT:{_endGameTracker.OpenTiles};CT:{_endGameTracker.CoveredTiles}";
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+        }
+
+        public virtual bool IsInBoard(int x, int y)
         {
             return !(x < 0 || x > Width - 1 || y < 0 || y > Height - 1);
         }
 
-        public void Flag(int x, int y)
+        public virtual void Flag(int x, int y)
         {
             if (!IsInBoard(x, y))
             {
@@ -116,7 +130,7 @@ namespace MinesweeperSolver.GameSimulator.Models
             _tiles[x, y].Flag();
         }
 
-        public bool IsFlagged(int x, int y)
+        public virtual bool IsFlagged(int x, int y)
         {
             if (!IsInBoard(x, y))
             {
@@ -126,7 +140,7 @@ namespace MinesweeperSolver.GameSimulator.Models
             return _tiles[x, y].Flagged;
         }
 
-        public void OpenTile(int x, int y)
+        public virtual void OpenTile(int x, int y)
         {
             if (!IsInBoard(x, y))
             {
@@ -143,7 +157,7 @@ namespace MinesweeperSolver.GameSimulator.Models
             _postOpen(x, y);
         }
 
-        public bool IsCovered(int x, int y)
+        public virtual bool IsCovered(int x, int y)
         {
             if (!IsInBoard(x, y))
             {
@@ -153,7 +167,7 @@ namespace MinesweeperSolver.GameSimulator.Models
             return _tiles[x, y].Covered;
         }
 
-        public bool? IsMine(int x, int y)
+        public virtual bool? IsMine(int x, int y)
         {
             if (!IsInBoard(x, y))
             {
@@ -166,7 +180,7 @@ namespace MinesweeperSolver.GameSimulator.Models
         /// <summary>
         /// 0-8, -1 if is covered.
         /// </summary>
-        public int? SurroundingMineCount(int x, int y)
+        public virtual int? SurroundingMineCount(int x, int y)
         {
             if (_endGameTracker.IsFinished())
             {
