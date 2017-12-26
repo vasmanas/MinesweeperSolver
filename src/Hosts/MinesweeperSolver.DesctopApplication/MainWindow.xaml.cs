@@ -88,7 +88,7 @@ namespace MinesweeperSolver.DesctopApplication
                     rowCount,
                     mineCount,
                     generator,
-                    (x, y) => this.GetTileViewModel(MineField, x, y)?.Model.NotifyUncovering());
+                    MineField);
 
             var viewTiles = new MinesweeperTile[colCount, rowCount];
 
@@ -108,19 +108,6 @@ namespace MinesweeperSolver.DesctopApplication
                     MineField.Children.Add(viewTile);
                 }
             }
-        }
-
-        private MinesweeperTile GetTileViewModel(Grid grid, int column, int row)
-        {
-            foreach (UIElement child in grid.Children)
-            {
-                if (Grid.GetRow(child) == row && Grid.GetColumn(child) == column)
-                {
-                    return child as MinesweeperTile;
-                }
-            }
-
-            return null;
         }
 
         private bool IsPositiveInteger(string text)
