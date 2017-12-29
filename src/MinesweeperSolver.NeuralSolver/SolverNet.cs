@@ -1,31 +1,175 @@
-﻿using System;
+﻿using Accord.Neuro;
+using Accord.Neuro.Networks;
+using Accord.Neuro.Learning;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Accord.Neuro.ActivationFunctions;
+using MinesweeperSolver.GameSimulator.Models;
+using MinesweeperSolver.GameSimulator;
 
 namespace MinesweeperSolver.NeuralSolver
 {
     /// <summary>
     /// http://alishertortay.me/2016/12/22/minesweeper-solver-using-nn/
     /// </summary>
-    public class Class1
+    public class SolverNet
     {
-        /// 9: 0-8
-        /// 1: Mine
-        /// 1: Flag
-        /// 1: Unknown
-        /// Total: 12
-        /// 11x11x12=1452, 256, 256, and 128
+        public void Solve()
+        {
+            /// 1: Off limits
+            /// 1: Covered
+            /// 1: Flag
+            /// 9: 0-8
+            /// Total: 12
+            /// 11x11x12=1452
+
+            /// Networks
+            const int InputCount = 11 * 11 * 12 + 1;
+
+            ActivationNetwork[] networks = new DeepBeliefNetwork[100];
+            for (int i = 0; i < networks.Length; i++)
+            {
+                /// BernoulliFunction, SigmoidFunction
+                networks[i] = new DeepBeliefNetwork(new GaussianFunction(), InputCount, 256, 256, 128, 2);
+            }
+
+            //var teacher = new EvolutionaryLearning(network, 100);
+            //var teacher = new BackPropagationLearning(network)
+            //{
+            //    LearningRate = 0.1,
+            //    Momentum = 0.9
+            //};
+
+            var width = 10;
+            var height = 10;
+
+            /// Networks
+            for (int i = 0; i < networks.Length; i++)
+            {
+                var network = networks[0];
+
+                /// Game count
+                for (int g = 0; g < 100; g++)
+                {
+                    var board = new Board(width, height, 10, new BoardGeneratorService());
+
+                    var lost = false;
+                    while (board.EndOfGame == State.Playing && !lost)
+                    {
+                        if (!IterateBoard(network, width, height, board, true))
+                        {
+                            if (!IterateBoard(network, width, height, board, false))
+                            {
+                                lost = true;
+                            }
+                        }
+                    }
+
+                    // TODO: Calc stats
+                }
+            }
+        }
+
+        private bool IterateBoard(ActivationNetwork network, int width, int height, Board board, bool firstCycle)
+        {
+            /// x 
+            for (int x = 0; x < width; x++)
+            {
+                /// y
+                for (int y = 0; y < height; y++)
+                {
+                    if (!board.IsCovered(x, y))
+                    {
+                        continue;
+                    }
+
+                    var features = ExtractFeatures(board, 5, x, y, firstCycle);
+
+                    /// 1st - Open
+                    /// 2nd - Flag
+                    var outputs = network.Compute(features);
+
+                    if (outputs[0] > 0.5)
+                    {
+                        board.OpenTile(x, y);
+
+                        return true;
+                    }
+                    else if (outputs[1] > 0.5)
+                    {
+                        board.Flag(x, y);
+
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private double[] ExtractFeatures(Board board, int range, int x, int y, bool firstCycle)
+        {
+            var inputCount = (range * 2 + 1) * (range * 2 + 1) * 12 + 1;
+
+            var inputs = new double[inputCount];
+
+            inputs[0] = firstCycle ? 0 : 1;
+
+            /// (range + 1 + range)x(range + 1 + range)
+            for (int dx = x - range; dx <= x + range; dx++)
+            {
+                for (int dy = y - range; dy <= y + range; dy++)
+                {
+                    ///  0 - {off limits}
+                    ///  1 - {Covered}
+                    ///  2 - {Flagged}
+                    ///  3 - {0}
+                    ///  4 - {1}
+                    ///  5 - {2}
+                    ///  6 - {3}
+                    ///  7 - {4}
+                    ///  8 - {5}
+                    ///  9 - {6}
+                    /// 10 - {7}
+                    /// 11 - {8}
+
+                    var linePos = 1 + ((dx + range) * (range * 2 + 1) + (dy + range)) * 12;
+
+                    if (board.IsInBoard(dx, dy))
+                    {
+                        if (board.IsCovered(dx, dy))
+                        {
+                            if (board.IsFlagged(dx, dy))
+                            {
+                                linePos += 2;
+                            }
+                            else
+                            {
+                                linePos += 1;
+                            }
+                        }
+                        else
+                        {
+                            var mines = board.SurroundingMineCount(dx, dy);
+
+                            linePos += 3 + mines.Value;
+                        }
+                    }
+
+                    inputs[linePos] = 1;
+                }
+            }
+
+            return inputs;
+        }
     }
 
 
     ////private void Train(Network netModel, Dispatcher dispatcher)
     ////    {
-    ////            // q    w    e    r    t    y    u    i    o    p    a    s    d    f    g    h    j    k    l    z    x    c    v    b    n    m  - 26
-    ////            // Q    W    E    R    T    Y    U    I    O    P    A    S    D    F    G    H    J    K    L    Z    X    C    V    B    N    M  - 26
-    ////            // 0    1    2    3    4    5    6    7    8    9                                                                                  - 10 62
-
     ////            var localLowestError = double.MaxValue;
 
     ////    /// Networks

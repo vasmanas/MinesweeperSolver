@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MinesweeperSolver.NeuralSolver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,9 @@ namespace MinesweeperSolver.ConsoleRunner
     {
         static void Main(string[] args)
         {
+            var solution = new SolverNet();
+
+            solution.Solve();
         }
     }
 }

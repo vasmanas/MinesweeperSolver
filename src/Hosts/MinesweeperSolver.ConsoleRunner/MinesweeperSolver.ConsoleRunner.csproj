@@ -53,6 +53,10 @@
       <Project>{9405daa6-0bb5-4d25-b701-6b1461f20eb1}</Project>
       <Name>MinesweeperSolver.GameSimulator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\MinesweeperSolver.NeuralSolver\MinesweeperSolver.NeuralSolver.csproj">
+      <Project>{244E2377-A1C1-4CDF-B562-7B11435105A3}</Project>
+      <Name>MinesweeperSolver.NeuralSolver</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
