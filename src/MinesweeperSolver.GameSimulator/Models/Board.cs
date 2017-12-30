@@ -52,6 +52,7 @@ namespace MinesweeperSolver.GameSimulator.Models
 
             Width = width;
             Height = height;
+            Mines = mineCount;
 
             _endGameTracker = new EndGameTracker(width * height, mineCount);
 
@@ -90,6 +91,8 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public int Height { get; }
 
+        public int Mines { get; }
+
         public State EndOfGame => _endGameTracker.State;
 
         public string EndOfGameStatistics
@@ -104,6 +107,14 @@ namespace MinesweeperSolver.GameSimulator.Models
                 {
                     return string.Empty;
                 }
+            }
+        }
+
+        public int OpenedTiles
+        {
+            get
+            {
+                return _endGameTracker.OpenTiles;
             }
         }
 

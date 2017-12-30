@@ -68,7 +68,25 @@ namespace MinesweeperSolver.NeuralSolver
                         }
                     }
 
-                    // TODO: Calc stats
+                    var result = 0;
+                    if (lost)
+                    {
+                        result = board.OpenedTiles / (board.Width * board.Height - board.Mines);
+                    }
+                    else
+                    {
+                        if (board.EndOfGame == State.Won)
+                        {
+                            result = 1;
+                        }
+                        else
+                        {
+                            result = board.OpenedTiles / (board.Width * board.Height - board.Mines);
+
+                            // TODO: Correct flags
+                            // TODO: Incorrect flags
+                        }
+                    }
                 }
             }
         }
@@ -136,7 +154,7 @@ namespace MinesweeperSolver.NeuralSolver
                     /// 10 - {7}
                     /// 11 - {8}
 
-                    var linePos = 1 + ((dx + range) * (range * 2 + 1) + (dy + range)) * 12;
+                    var linePos = 1 + ((dx - (x - range)) * (range * 2 + 1) + (dy - (y - range))) * 12;
 
                     if (board.IsInBoard(dx, dy))
                     {
