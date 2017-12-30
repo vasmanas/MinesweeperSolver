@@ -118,6 +118,22 @@ namespace MinesweeperSolver.GameSimulator.Models
             }
         }
 
+        public int CorrectFlags
+        {
+            get
+            {
+                return _endGameTracker.CorrectFlags;
+            }
+        }
+
+        public int IncorrectFlags
+        {
+            get
+            {
+                return _endGameTracker.IncorrectFlags;
+            }
+        }
+
         public virtual bool IsInBoard(int x, int y)
         {
             return !(x < 0 || x > Width - 1 || y < 0 || y > Height - 1);

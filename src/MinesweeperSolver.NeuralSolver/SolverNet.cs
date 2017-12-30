@@ -50,6 +50,7 @@ namespace MinesweeperSolver.NeuralSolver
             for (int i = 0; i < networks.Length; i++)
             {
                 var network = networks[0];
+                double totalScore = 0;
 
                 /// Game count
                 for (int g = 0; g < 100; g++)
@@ -68,26 +69,38 @@ namespace MinesweeperSolver.NeuralSolver
                         }
                     }
 
-                    var result = 0;
+                    double gameScore = 0;
                     if (lost)
                     {
-                        result = board.OpenedTiles / (board.Width * board.Height - board.Mines);
+                        /// Open tiles
+                        gameScore += (1.0 * board.OpenedTiles) / (board.Width * board.Height - board.Mines);
                     }
                     else
                     {
                         if (board.EndOfGame == State.Won)
                         {
-                            result = 1;
+                            /// Open tiles
+                            gameScore += 1;
+
+                            /// Correct flags
+                            gameScore += 1;
                         }
                         else
                         {
-                            result = board.OpenedTiles / (board.Width * board.Height - board.Mines);
+                            /// Open tiles
+                            gameScore += (1.0 * board.OpenedTiles) / (board.Width * board.Height - board.Mines);
 
-                            // TODO: Correct flags
-                            // TODO: Incorrect flags
+                            /// Correct flags
+                            gameScore += ((1.0 * board.CorrectFlags) / board.Mines);
+
+                            /// TODO: Incorrect flags
                         }
                     }
+
+                    totalScore += gameScore;
                 }
+
+                Console.WriteLine(totalScore);
             }
         }
 
