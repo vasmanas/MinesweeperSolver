@@ -35,15 +35,9 @@ namespace MinesweeperSolver.NeuralSolver
                 scoreBoard[i] = new ScoredNetwork(new DeepBeliefNetwork(new GaussianFunction(), 1 + (11 * 11 * 12), 256, 256, 128, 2));
             }
 
-            //var teacher = new EvolutionaryLearning(network, 100);
-            //var teacher = new BackPropagationLearning(network)
-            //{
-            //    LearningRate = 0.1,
-            //    Momentum = 0.9
-            //};
-
             var width = 10;
             var height = 10;
+            var mineCount = 10;
 
             /// Generations
             for (int gc = 0; gc < 1000; gc++)
@@ -56,8 +50,9 @@ namespace MinesweeperSolver.NeuralSolver
                     Parallel.For(
                         0,
                         100,
-                        g => {
-                            var board = new Board(width, height, 10, new BoardGeneratorService());
+                        g =>
+                        {
+                            var board = new Board(width, height, mineCount, new BoardGeneratorService());
 
                             var lost = false;
                             while (board.EndOfGame == State.Playing && !lost)
@@ -72,11 +67,14 @@ namespace MinesweeperSolver.NeuralSolver
                         });
 
                     // Calculate top best games and count them as fitness
-                    player.Fitness = scores.OrderByDescending(e => e).Take(10).Sum();
+                    player.Fitness = scores.OrderByDescending(e => e).Take(50).Sum();
                 }
 
                 scoreBoard = RegenerateNetworks(scoreBoard);
             }
+
+            Console.WriteLine("Finished");
+            Console.ReadKey();
         }
 
         private ScoredNetwork[] RegenerateNetworks(ScoredNetwork[] scores)
@@ -85,51 +83,53 @@ namespace MinesweeperSolver.NeuralSolver
 
             Console.WriteLine($"Top has {orderedSocres.First().Fitness}");
 
-            /// Take to 13 from top
-            var top = orderedSocres.Take(13).ToList();
+            /// Take to 10 from top
+            var top = orderedSocres.Take(10).ToList();
             for (int i = 0; i < top.Count; i++)
             {
                 scores[i] = top[i];
             }
 
-            /// And 9 random
-            var bottom = orderedSocres.Skip(13).ToList();
-            var rnd = new Random();
+            ///// And 9 random
+            //var bottom = orderedSocres.Skip(13).ToList();
+            //var rnd = new Random();
 
-            for (int i = 0; i < 9; i++)
-            {
-                var pos = rnd.Next(bottom.Count);
+            //for (int i = 0; i < 9; i++)
+            //{
+            //    var pos = rnd.Next(bottom.Count);
 
-                scores[top.Count + i] = bottom[pos];
+            //    scores[top.Count + i] = bottom[pos];
 
-                bottom.RemoveAt(pos);
-            }
+            //    bottom.RemoveAt(pos);
+            //}
 
             /// Breed from top only
             /// when total 4
             /// 0:1, 0:2, 0:3
             /// 1:2, 1:3
             /// 2:3
-            var startIndex = top.Count + 9;
+            var startIndex = top.Count/* + 9*/;
 
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < top.Count - 1; i++)
             {
-                for (int j = i + 1; j < 13; j++)
+                for (int j = i + 1; j < top.Count; j++)
                 {
-                    var child = Breed(top[i].Network, top[j].Network);
+                    var children = Breed(top[i].Network, top[j].Network);
 
-                    scores[startIndex] = new ScoredNetwork(child);
+                    scores[startIndex] = new ScoredNetwork(children[0]);
+                    scores[startIndex + 1] = new ScoredNetwork(children[1]);
 
-                    startIndex++;
+                    startIndex += 2;
                 }
             }
 
             return scores;
         }
 
-        private ActivationNetwork Breed(ActivationNetwork mother, ActivationNetwork father)
+        private ActivationNetwork[] Breed(ActivationNetwork mother, ActivationNetwork father)
         {
-            var child = new DeepBeliefNetwork(new GaussianFunction(), 1 + (11 * 11 * 12), 256, 256, 128, 2);
+            var child1 = new DeepBeliefNetwork(new GaussianFunction(), 1 + (11 * 11 * 12), 256, 256, 128, 2);
+            var child2 = new DeepBeliefNetwork(new GaussianFunction(), 1 + (11 * 11 * 12), 256, 256, 128, 2);
             var rnd = new Random();
 
             // each layer
@@ -138,16 +138,30 @@ namespace MinesweeperSolver.NeuralSolver
                 // each neuron
                 for (int n = 0; n < mother.Layers[l].Neurons.Length; n++)
                 {
-                    // each weigth
-                    for (int w = 0; w < mother.Layers[l].Neurons[n].Weights.Length; w++)
+                    ActivationNetwork parent1;
+                    ActivationNetwork parent2;
+
+                    if (rnd.Next(2) == 0)
                     {
-                        child.Layers[l].Neurons[n].Weights[w] =
-                            rnd.Next(2) == 0 ? mother.Layers[l].Neurons[n].Weights[w] : father.Layers[l].Neurons[n].Weights[w];
+                        parent1 = mother;
+                        parent2 = father;
+                    }
+                    else
+                    {
+                        parent1 = father;
+                        parent2 = mother;
+                    }
+
+                    // each weigth
+                    for (int w = 0; w < parent1.Layers[l].Neurons[n].Weights.Length; w++)
+                    {
+                        child1.Layers[l].Neurons[n].Weights[w] = parent1.Layers[l].Neurons[n].Weights[w];
+                        child2.Layers[l].Neurons[n].Weights[w] = parent2.Layers[l].Neurons[n].Weights[w];
                     }
                 }
             }
 
-            return child;
+            return new[] { child1, child2 };
         }
 
         private double CaclulateGameScore(Board board, bool lost)
@@ -202,13 +216,13 @@ namespace MinesweeperSolver.NeuralSolver
                     /// 2nd - Flag
                     var outputs = network.Compute(features);
 
-                    if (outputs[0] > 0.5)
+                    if (outputs[0] > 0.9)
                     {
                         board.OpenTile(x, y);
 
                         return true;
                     }
-                    else if (outputs[1] > 0.5)
+                    else if (outputs[1] > 0.9)
                     {
                         board.Flag(x, y);
 
@@ -276,207 +290,4 @@ namespace MinesweeperSolver.NeuralSolver
             return inputs;
         }
     }
-
-
-    ////private void Train(Network netModel, Dispatcher dispatcher)
-    ////    {
-    ////            var localLowestError = double.MaxValue;
-
-    ////    /// Networks
-    ////    ActivationNetwork network;
-
-    ////    //network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 2048, 62);
-    ////    //network = new DeepBeliefNetwork(new GaussianFunction(), 1024, 744, 62);
-    ////    //network = new DeepBeliefNetwork(new BernoulliFunction(), 1024, 62);
-    ////    //network = new ActivationNetwork(new SigmoidFunction(), 1024, 62);
-
-    ////    //var nn = MakeName(network);
-    ////    //network.Save(string.Format("{0}\\{1}_{2:yyyyMMdd_HHmmssfff}.ann", nn, localLowestError, DateTime.UtcNow));
-
-    ////    /// Teachers
-    ////    //DeepBeliefNetworkLearning teacher = new DeepBeliefNetworkLearning(network)
-    ////    //{
-    ////    //    Algorithm = (h, v, i) => new ContrastiveDivergenceLearning(h, v)
-    ////    //    {
-    ////    //        LearningRate = 0.1,
-    ////    //        Momentum = 0.5,
-    ////    //        Decay = 0.001,
-    ////    //    },
-    ////    //    LayerIndex = SelectedLayerIndex - 1,
-    ////    //};
-
-    ////    //network = DeepBeliefNetwork.Load("C:\\work\\1024_62_20170307_1543.ann");
-    ////    var filePath = GetBestSave(netModel.FullPath, out localLowestError);
-    ////    network = DeepBeliefNetwork.Load(filePath);
-
-    ////            dispatcher.BeginInvoke((Action<Network, int, double>) UpdateError, DispatcherPriority.ContextIdle, netModel, 0, localLowestError);
-
-    ////            var teacher = new BackPropagationLearning(network)
-    ////            {
-    ////                LearningRate = 0.1,
-    ////                Momentum = 0.9
-    ////            };
-
-    ////    //DeepNeuralNetworkLearning teacher = new DeepNeuralNetworkLearning(Main.Network)
-    ////    //{
-    ////    //    Algorithm = (ann, i) => new ParallelResilientBackpropagationLearning(ann),
-    ////    //    LayerIndex = Main.Network.Layers.Length - 1,
-    ////    //};
-
-    ////    double[][] inputs, outputs;
-
-    ////    inputs = new double[this.OriginalLetters.Count][];
-    ////            outputs = new double[this.OriginalLetters.Count][];
-
-    ////            for (int i = 0; i<inputs.Length; i++)
-    ////            {
-    ////                //int total = set[i].Database.Classes;
-
-    ////                inputs[i] = this.OriginalLetters[i].Features;
-    ////                outputs[i] = new double[62];
-
-    ////                var charCode = (byte)this.OriginalLetters[i].Character;
-
-    ////                if (charCode >= 48 && charCode <= 57)
-    ////                {
-    ////        // 0..9: 48 -  57 (52 - 61)
-    ////        outputs[i][charCode - 48 + 52] = 1;
-    ////    }
-    ////                else if (charCode >= 65 && charCode <= 90)
-    ////                {
-    ////        // A..Z: 65 -  90 (26 - 51)
-    ////        outputs[i][charCode - 65 + 26] = 1;
-    ////    }
-    ////                else if (charCode >= 97 && charCode <= 122)
-    ////                {
-    ////        // a..z: 97 - 122 ( 0 - 25)
-    ////        outputs[i][charCode - 97] = 1;
-    ////    }
-    ////    }
-
-    ////    Utils.Normalize(inputs);
-
-    ////            var cnt = 0;
-    ////    var lastOutput = DateTime.UtcNow;
-    ////    var networkName = MakeName(network);
-
-    ////            while (true)
-    ////            {
-    ////                Utils.Randomize(ref inputs, ref outputs);
-
-    ////                // run epoch of learning procedure
-    ////                double error = teacher.RunEpoch(inputs, outputs);
-
-    ////                // check error value to see
-    ////                if (error< 0.45)
-    ////                {
-    ////                    System.Diagnostics.Debug.WriteLine("learned at {0}", cnt);
-
-    ////                    break;
-    ////                }
-
-    ////                if (network is DeepBeliefNetwork)
-    ////                {
-    ////                    ((DeepBeliefNetwork) network).UpdateVisibleWeights();
-    ////                }
-
-    ////                if ((DateTime.UtcNow - lastOutput).TotalSeconds > 5)
-    ////                {
-    ////                    lastOutput = DateTime.UtcNow;
-
-    ////                    System.Diagnostics.Debug.WriteLine("{2:yyyy-MM-dd HH:mm:ss.fff} {0}. error: {1}", cnt, error, lastOutput);
-
-    ////                    dispatcher.BeginInvoke((Action<Network, int, double>) UpdateError, DispatcherPriority.ContextIdle, netModel, cnt + 1, error);
-    ////                }
-
-    ////                if (localLowestError > error)
-    ////                {
-    ////                    if (!Directory.Exists(networkName))
-    ////                    {
-    ////                        Directory.CreateDirectory(networkName);
-    ////                    }
-
-    ////                    network.Save(string.Format("{0}\\{1}_{2:yyyyMMdd_HHmmssfff}.ann", networkName, error, DateTime.UtcNow));
-
-    ////                    localLowestError = error;
-
-    ////                    dispatcher.BeginInvoke((Action<Network, int, double>) UpdateError, DispatcherPriority.ContextIdle, netModel, cnt + 1, error);
-    ////                }
-
-    ////                cnt++;
-    ////            }
-    ////        }
-
-    ////        public void StopTraining(Network network)
-    ////{
-    ////    var source = network.TokenSource;
-
-    ////    network.TrainingTask = null;
-    ////    network.TokenSource = null;
-
-    ////    source.Cancel();
-    ////}
-
-    ////private void UpdateError(Network network, int epoch, double error)
-    ////{
-    ////    network.CurrentEpoch = epoch;
-    ////    network.CurrentError = error;
-    ////}
-
-    ////public static string GetBestSave(string networkSavePath, out double minError)
-    ////{
-    ////    var fileNames = Directory.EnumerateFiles(networkSavePath, "*.ann");
-
-    ////    minError = double.MaxValue;
-    ////    var minFileName = string.Empty;
-
-    ////    foreach (var fileName in fileNames)
-    ////    {
-    ////        var fileNameParts = Path.GetFileName(fileName).Split('_');
-
-    ////        if (double.TryParse(fileNameParts[0].Replace(',', '.'), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double errorValue))
-    ////        {
-    ////            if (errorValue < minError)
-    ////            {
-    ////                minError = errorValue;
-    ////                minFileName = fileName;
-    ////            }
-    ////        }
-    ////    }
-
-    ////    return minFileName;
-    ////}
-
-    ////private static string MakeName(ActivationNetwork network)
-    ////{
-    ////    var layers = network.Layers;
-    ////    var name = string.Empty;
-    ////    for (int i = 0; i < layers.Length; i++)
-    ////    {
-    ////        name += string.Format("{0}_", layers[i].InputsCount);
-
-    ////        if (i == layers.Length - 1)
-    ////        {
-    ////            name += string.Format("{0}", layers[i].Neurons.Length);
-    ////        }
-    ////    }
-
-    ////    return name;
-    ////}
-
-    ////private static double[] ToFeatures(Bitmap bmp)
-    ////{
-    ////    var features = new double[32 * 32];
-
-    ////    for (int i = 32 * 32 - 1; i >= 0; i--)
-    ////    {
-    ////        features[i] = 255;
-    ////    }
-
-    ////    for (int i = 0; i < bmp.Height; i++)
-    ////        for (int j = 0; j < bmp.Width; j++)
-    ////            features[i * 32 + j] = (bmp.GetPixel(j, i).R > 0) ? 0 : 1;
-
-    ////    return features;
-    ////}
 }
