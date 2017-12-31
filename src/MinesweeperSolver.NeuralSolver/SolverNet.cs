@@ -27,13 +27,11 @@ namespace MinesweeperSolver.NeuralSolver
             /// 11x11x12=1452
 
             /// Networks
-            const int InputCount = 11 * 11 * 12 + 1;
-
-            ActivationNetwork[] networks = new DeepBeliefNetwork[100];
-            for (int i = 0; i < networks.Length; i++)
+            ScoredNetwork[] scoreBoard = new ScoredNetwork[100];
+            for (int i = 0; i < scoreBoard.Length; i++)
             {
                 /// BernoulliFunction, SigmoidFunction
-                networks[i] = new DeepBeliefNetwork(new GaussianFunction(), InputCount, 256, 256, 128, 2);
+                scoreBoard[i] = new ScoredNetwork(new DeepBeliefNetwork(new GaussianFunction(), 1 + (11 * 11 * 12), 256, 256, 128, 2));
             }
 
             //var teacher = new EvolutionaryLearning(network, 100);
@@ -46,62 +44,138 @@ namespace MinesweeperSolver.NeuralSolver
             var width = 10;
             var height = 10;
 
-            /// Networks
-            for (int i = 0; i < networks.Length; i++)
+            /// Generations
+            for (int gc = 0; gc < 40; gc++)
             {
-                var network = networks[0];
-                double totalScore = 0;
-
-                /// Game count
-                for (int g = 0; g < 100; g++)
+                /// Networks
+                foreach (var player in scoreBoard)
                 {
-                    var board = new Board(width, height, 10, new BoardGeneratorService());
+                    player.Fitness = 0;
 
-                    var lost = false;
-                    while (board.EndOfGame == State.Playing && !lost)
+                    /// Game count
+                    for (int g = 0; g < 100; g++)
                     {
-                        if (!IterateBoard(network, width, height, board, true))
+                        var board = new Board(width, height, 10, new BoardGeneratorService());
+
+                        var lost = false;
+                        while (board.EndOfGame == State.Playing && !lost)
                         {
-                            if (!IterateBoard(network, width, height, board, false))
-                            {
-                                lost = true;
-                            }
+                            lost = !IterateBoard(player.Network, width, height, board, true)
+                                && !IterateBoard(player.Network, width, height, board, false);
                         }
+
+                        // TODO: Calculate top 10 best games and count them as fitness
+
+                        player.Fitness += CaclulateGameScore(board, lost);
                     }
-
-                    double gameScore = 0;
-                    if (lost)
-                    {
-                        /// Open tiles
-                        gameScore += (1.0 * board.OpenedTiles) / (board.Width * board.Height - board.Mines);
-                    }
-                    else
-                    {
-                        if (board.EndOfGame == State.Won)
-                        {
-                            /// Open tiles
-                            gameScore += 1;
-
-                            /// Correct flags
-                            gameScore += 1;
-                        }
-                        else
-                        {
-                            /// Open tiles
-                            gameScore += (1.0 * board.OpenedTiles) / (board.Width * board.Height - board.Mines);
-
-                            /// Correct flags
-                            gameScore += ((1.0 * board.CorrectFlags) / board.Mines);
-
-                            /// TODO: Incorrect flags
-                        }
-                    }
-
-                    totalScore += gameScore;
                 }
 
-                Console.WriteLine(totalScore);
+                scoreBoard = RegenerateNetworks(scoreBoard);
             }
+        }
+
+        private ScoredNetwork[] RegenerateNetworks(ScoredNetwork[] scores)
+        {
+            var orderedSocres = scores.OrderByDescending(e => e.Fitness).ToList();
+
+            Console.WriteLine($"Top has {orderedSocres.First().Fitness}");
+
+            /// Take to 13 from top
+            var top = orderedSocres.Take(13).ToList();
+            for (int i = 0; i < top.Count; i++)
+            {
+                scores[i] = top[i];
+            }
+
+            /// And 9 random
+            var bottom = orderedSocres.Skip(13).ToList();
+            var rnd = new Random();
+
+            for (int i = 0; i < 9; i++)
+            {
+                var pos = rnd.Next(bottom.Count);
+
+                scores[top.Count + i] = bottom[pos];
+
+                bottom.RemoveAt(pos);
+            }
+
+            /// Breed from top only
+            /// when total 4
+            /// 0:1, 0:2, 0:3
+            /// 1:2, 1:3
+            /// 2:3
+            var startIndex = top.Count + 9;
+
+            for (int i = 0; i < 12; i++)
+            {
+                for (int j = i + 1; j < 13; j++)
+                {
+                    var child = Breed(top[i].Network, top[j].Network);
+
+                    scores[startIndex] = new ScoredNetwork(child);
+
+                    startIndex++;
+                }
+            }
+
+            return scores;
+        }
+
+        private ActivationNetwork Breed(ActivationNetwork mother, ActivationNetwork father)
+        {
+            var child = new DeepBeliefNetwork(new GaussianFunction(), 1 + (11 * 11 * 12), 256, 256, 128, 2);
+            var rnd = new Random();
+
+            // each layer
+            for (int l = 0; l < mother.Layers.Length; l++)
+            {
+                // each neuron
+                for (int n = 0; n < mother.Layers[l].Neurons.Length; n++)
+                {
+                    // each weigth
+                    for (int w = 0; w < mother.Layers[l].Neurons[n].Weights.Length; w++)
+                    {
+                        child.Layers[l].Neurons[n].Weights[w] =
+                            rnd.Next(2) == 0 ? mother.Layers[l].Neurons[n].Weights[w] : father.Layers[l].Neurons[n].Weights[w];
+                    }
+                }
+            }
+
+            return child;
+        }
+
+        private double CaclulateGameScore(Board board, bool lost)
+        {
+            double gameScore = 0;
+            if (lost)
+            {
+                /// Open tiles
+                gameScore += (1.0 * board.OpenedTiles) / (board.Width * board.Height - board.Mines);
+            }
+            else
+            {
+                if (board.EndOfGame == State.Won)
+                {
+                    /// Open tiles
+                    gameScore += 1;
+
+                    /// Correct flags
+                    gameScore += 1;
+                }
+                else
+                {
+                    /// Open tiles
+                    gameScore += (1.0 * board.OpenedTiles) / (board.Width * board.Height - board.Mines);
+
+                    /// Correct flags
+                    gameScore += ((1.0 * board.CorrectFlags) / board.Mines);
+
+                    /// TODO: Incorrect flags
+                }
+            }
+
+            return gameScore;
         }
 
         private bool IterateBoard(ActivationNetwork network, int width, int height, Board board, bool firstCycle)
