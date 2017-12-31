@@ -50,7 +50,8 @@ namespace MinesweeperSolver.NeuralSolver
                 /// Networks
                 foreach (var player in scoreBoard)
                 {
-                    player.Fitness = 0;
+                    // Take only some top best games
+                    var scores = new List<double>();
 
                     /// Game count
                     for (int g = 0; g < 100; g++)
@@ -64,10 +65,15 @@ namespace MinesweeperSolver.NeuralSolver
                                 && !IterateBoard(player.Network, width, height, board, false);
                         }
 
-                        // TODO: Calculate top 10 best games and count them as fitness
+                        // Calculate top 40 best games and count them as fitness
+                        var score = CaclulateGameScore(board, lost);
 
-                        player.Fitness += CaclulateGameScore(board, lost);
+                        scores.Add(score);
+
+                        scores = scores.OrderByDescending(e => e).Take(40).ToList();
                     }
+
+                    player.Fitness = scores.Sum();
                 }
 
                 scoreBoard = RegenerateNetworks(scoreBoard);
