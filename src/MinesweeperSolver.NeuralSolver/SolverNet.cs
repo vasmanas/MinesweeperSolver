@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Accord.Neuro.ActivationFunctions;
 using MinesweeperSolver.GameSimulator.Models;
 using MinesweeperSolver.GameSimulator;
+using System.Collections.Concurrent;
 
 namespace MinesweeperSolver.NeuralSolver
 {
@@ -45,35 +46,33 @@ namespace MinesweeperSolver.NeuralSolver
             var height = 10;
 
             /// Generations
-            for (int gc = 0; gc < 40; gc++)
+            for (int gc = 0; gc < 1000; gc++)
             {
                 /// Networks
                 foreach (var player in scoreBoard)
                 {
-                    // Take only some top best games
-                    var scores = new List<double>();
+                    var scores = new ConcurrentBag<double>();
 
-                    /// Game count
-                    for (int g = 0; g < 100; g++)
-                    {
-                        var board = new Board(width, height, 10, new BoardGeneratorService());
+                    Parallel.For(
+                        0,
+                        100,
+                        g => {
+                            var board = new Board(width, height, 10, new BoardGeneratorService());
 
-                        var lost = false;
-                        while (board.EndOfGame == State.Playing && !lost)
-                        {
-                            lost = !IterateBoard(player.Network, width, height, board, true)
-                                && !IterateBoard(player.Network, width, height, board, false);
-                        }
+                            var lost = false;
+                            while (board.EndOfGame == State.Playing && !lost)
+                            {
+                                lost = !IterateBoard(player.Network, width, height, board, true)
+                                    && !IterateBoard(player.Network, width, height, board, false);
+                            }
 
-                        // Calculate top 40 best games and count them as fitness
-                        var score = CaclulateGameScore(board, lost);
+                            var score = CaclulateGameScore(board, lost);
 
-                        scores.Add(score);
+                            scores.Add(score);
+                        });
 
-                        scores = scores.OrderByDescending(e => e).Take(40).ToList();
-                    }
-
-                    player.Fitness = scores.Sum();
+                    // Calculate top best games and count them as fitness
+                    player.Fitness = scores.OrderByDescending(e => e).Take(10).Sum();
                 }
 
                 scoreBoard = RegenerateNetworks(scoreBoard);
