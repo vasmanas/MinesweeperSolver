@@ -55,14 +55,14 @@ namespace MinesweeperSolver.GameSimulator.Tests
 
             var board = new Board(1, 1, 1, generator);
 
-            Assert.IsFalse(board.IsInBoard(-1, -1));
-            Assert.IsFalse(board.IsInBoard(-1, 0));
-            Assert.IsFalse(board.IsInBoard(-1, 1));
-            Assert.IsFalse(board.IsInBoard(0, -1));
-            Assert.IsFalse(board.IsInBoard(0, 1));
-            Assert.IsFalse(board.IsInBoard(1, -1));
-            Assert.IsFalse(board.IsInBoard(1, 0));
-            Assert.IsFalse(board.IsInBoard(1, 1));
+            Assert.IsFalse(board.IsOnBoard(-1, -1));
+            Assert.IsFalse(board.IsOnBoard(-1, 0));
+            Assert.IsFalse(board.IsOnBoard(-1, 1));
+            Assert.IsFalse(board.IsOnBoard(0, -1));
+            Assert.IsFalse(board.IsOnBoard(0, 1));
+            Assert.IsFalse(board.IsOnBoard(1, -1));
+            Assert.IsFalse(board.IsOnBoard(1, 0));
+            Assert.IsFalse(board.IsOnBoard(1, 1));
         }
 
         [TestMethod]

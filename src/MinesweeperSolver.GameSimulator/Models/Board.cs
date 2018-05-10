@@ -134,14 +134,14 @@ namespace MinesweeperSolver.GameSimulator.Models
             }
         }
 
-        public virtual bool IsInBoard(int x, int y)
+        public virtual bool IsOnBoard(int x, int y)
         {
             return !(x < 0 || x > Width - 1 || y < 0 || y > Height - 1);
         }
 
         public virtual void Flag(int x, int y)
         {
-            if (!IsInBoard(x, y))
+            if (!IsOnBoard(x, y))
             {
                 return;
             }
@@ -156,7 +156,7 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public virtual bool IsFlagged(int x, int y)
         {
-            if (!IsInBoard(x, y))
+            if (!IsOnBoard(x, y))
             {
                 return false;
             }
@@ -166,7 +166,7 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public virtual void OpenTile(int x, int y)
         {
-            if (!IsInBoard(x, y))
+            if (!IsOnBoard(x, y))
             {
                 return;
             }
@@ -181,7 +181,7 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public virtual bool IsCovered(int x, int y)
         {
-            if (!IsInBoard(x, y))
+            if (!IsOnBoard(x, y))
             {
                 return false;
             }
@@ -191,7 +191,7 @@ namespace MinesweeperSolver.GameSimulator.Models
 
         public virtual bool? IsMine(int x, int y)
         {
-            if (!IsInBoard(x, y))
+            if (!IsOnBoard(x, y))
             {
                 return null;
             }
@@ -209,7 +209,7 @@ namespace MinesweeperSolver.GameSimulator.Models
                 return null;
             }
 
-            if (!IsInBoard(x, y))
+            if (!IsOnBoard(x, y))
             {
                 return null;
             }
@@ -254,7 +254,7 @@ namespace MinesweeperSolver.GameSimulator.Models
         {
             foreach (var delta in Deltas)
             {
-                if (IsInBoard(x + delta.DeltaX, y + delta.DeltaY))
+                if (IsOnBoard(x + delta.DeltaX, y + delta.DeltaY))
                 {
                     action(x + delta.DeltaX, y + delta.DeltaY);
                 }

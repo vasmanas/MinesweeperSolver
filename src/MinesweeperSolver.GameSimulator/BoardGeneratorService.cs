@@ -8,7 +8,7 @@ namespace MinesweeperSolver.GameSimulator
         {
             if (mineCount < 0 || width * height < mineCount)
             {
-                throw new ArgumentException("Value must be more than 0 and less than wigth * height", nameof(mineCount));
+                throw new ArgumentException("Value must be more than 0 and less than width * height", nameof(mineCount));
             }
 
             var tiles = new bool[width, height];
