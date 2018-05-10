@@ -92,7 +92,7 @@ namespace MinesweeperSolver.NeuralSolver
                     }
                 }
 
-                Console.WriteLine($"{gc}. Max fitness - {maxFitness}, {scoreBoard.OrderByDescending(e => e.Fitness).First().Fitness}");
+                Console.WriteLine($"{gc}. Max fitness - {maxFitness}");
                 // won/total +flagged/mines -flagged open/total
                 Console.WriteLine($"{ps.Count(s => s.Won)}/{GameCountToPlay}, {ps.Sum(s => s.CorrectFlags)}/{ps.Sum(s => s.MineCount)}, {ps.Sum(s => s.IncorrectFlags)}, {ps.Sum(s => s.OpenTiles)}/{ps.Sum(s => s.OpenableTiles)}");
             }
