@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NetworkBuilder.cs" />
+    <Compile Include="PlayStatistics.cs" />
     <Compile Include="ScoredNetwork.cs" />
     <Compile Include="SolverNet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

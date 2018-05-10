@@ -29,9 +29,9 @@ namespace MinesweeperSolver.NeuralSolver
             const int GenerationCount = 10000; ///10000;
             const int GameCountToPlay = 100; /// 100;
             
-            var width = 3;
-            var height = 3;
-            var mineCount = 1;
+            var width = 8;
+            var height = 8;
+            var mineCount = 10;
 
             /// Networks
             var scoreBoard = new ScoredNetwork[PlayerCount];
@@ -54,10 +54,13 @@ namespace MinesweeperSolver.NeuralSolver
                     scoreBoard = RegenerateNetworks(scoreBoard, width, height);
                 }
 
+                double maxFitness = -1;
+                ConcurrentBag<PlayStatistics> ps = null;
+
                 /// Networks
                 foreach (var player in scoreBoard)
                 {
-                    var scores = new ConcurrentBag<double>();
+                    var scores = new ConcurrentBag<PlayStatistics>();
 
                     Parallel.For(
                         0,
@@ -80,10 +83,18 @@ namespace MinesweeperSolver.NeuralSolver
 
                     // Calculate top best games and count them as fitness
                     //player.Fitness = scores.OrderByDescending(e => e).Take(50).Sum();
-                    player.Fitness = scores.Sum();
+                    player.Fitness = scores.Select(s => s.Score).Sum();
+
+                    if (maxFitness < player.Fitness)
+                    {
+                        maxFitness = player.Fitness;
+                        ps = scores;
+                    }
                 }
-                
-                Console.WriteLine($"Top has {scoreBoard.OrderByDescending(e => e.Fitness).First().Fitness}");
+
+                Console.WriteLine($"{gc}. Max fitness - {maxFitness}, {scoreBoard.OrderByDescending(e => e.Fitness).First().Fitness}");
+                // won/total +flagged/mines -flagged open/total
+                Console.WriteLine($"{ps.Count(s => s.Won)}/{GameCountToPlay}, {ps.Sum(s => s.CorrectFlags)}/{ps.Sum(s => s.MineCount)}, {ps.Sum(s => s.IncorrectFlags)}, {ps.Sum(s => s.OpenTiles)}/{ps.Sum(s => s.OpenableTiles)}");
             }
 
             Console.WriteLine("Finished");
@@ -94,32 +105,26 @@ namespace MinesweeperSolver.NeuralSolver
         {
             var orderedSocres = scores.OrderByDescending(e => e.Fitness).ToList();
 
-            /// Take to 10 from top
-            var top = orderedSocres.Take(10).ToList();
+            // TOP 10% for breeding
+            // 80 % bread ones
+            // add 10 % random
+
+            var tenPercent = (int)Math.Floor(scores.Length * 0.1);
+
+            var top = orderedSocres.Take(tenPercent).ToList();
             for (int i = 0; i < top.Count; i++)
             {
                 scores[i] = top[i];
             }
-
-            ///// And 9 random
-            //var bottom = orderedSocres.Skip(13).ToList();
-            //var rnd = new Random();
-
-            //for (int i = 0; i < 9; i++)
-            //{
-            //    var pos = rnd.Next(bottom.Count);
-
-            //    scores[top.Count + i] = bottom[pos];
-
-            //    bottom.RemoveAt(pos);
-            //}
-
+            
             /// Breed from top only
             /// when total 4
             /// 0:1, 0:2, 0:3
             /// 1:2, 1:3
             /// 2:3
-            var startIndex = top.Count/* + 9*/;
+            var ninetyPercent = orderedSocres.Count - tenPercent;
+
+            var startIndex = top.Count;
 
             for (int i = 0; i < top.Count - 1; i++)
             {
@@ -131,7 +136,18 @@ namespace MinesweeperSolver.NeuralSolver
                     scores[startIndex + 1] = new ScoredNetwork(children[1]);
 
                     startIndex += 2;
+
+                    if (ninetyPercent <= startIndex)
+                    {
+                        i = top.Count;
+                        j = top.Count;
+                    }
                 }
+            }
+
+            for (int i = startIndex; i < scores.Length; i++)
+            {
+                scores[i] = new ScoredNetwork(NetworkBuilder.Create(LookDistance));
             }
 
             return scores;
@@ -175,7 +191,7 @@ namespace MinesweeperSolver.NeuralSolver
             return new[] { child1, child2 };
         }
 
-        private double CaclulateGameScore(Board board, bool lost)
+        private PlayStatistics CaclulateGameScore(Board board, bool lost)
         {
             double gameScore = 0;
             if (board.EndOfGame == State.Won)
@@ -200,7 +216,14 @@ namespace MinesweeperSolver.NeuralSolver
                 /// TODO: Incorrect flags
             }
 
-            return gameScore;
+            return new PlayStatistics(
+                gameScore,
+                board.EndOfGame == State.Won,
+                board.CorrectFlags,
+                board.IncorrectFlags,
+                board.Mines,
+                board.OpenedTiles,
+                board.Width * board.Height - board.Mines);
         }
 
         private bool IterateBoard(ActivationNetwork network, int width, int height, Board board, bool firstCycle)
