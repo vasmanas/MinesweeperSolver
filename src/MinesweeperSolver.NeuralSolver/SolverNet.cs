@@ -44,8 +44,6 @@ namespace MinesweeperSolver.NeuralSolver
                 {
                     for (int i = 0; i < scoreBoard.Length; i++)
                     {
-                        /// TODO: weights are positive
-                        /// GaussianFunction, BernoulliFunction, SigmoidFunction
                         scoreBoard[i] = new ScoredNetwork(NetworkBuilder.Create(LookDistance));
                     }
                 }
@@ -245,13 +243,13 @@ namespace MinesweeperSolver.NeuralSolver
                     /// 2nd - Flag tile
                     var outputs = network.Compute(features);
 
-                    if (outputs[0] > 0.9)
+                    if (outputs[0] > 0.45 && outputs[0] < 0.55)
                     {
                         board.OpenTile(x, y);
 
                         return true;
                     }
-                    else if (outputs[1] > 0.9)
+                    else if (outputs[1] > 0.45 && outputs[1] < 0.55)
                     {
                         board.Flag(x, y);
 

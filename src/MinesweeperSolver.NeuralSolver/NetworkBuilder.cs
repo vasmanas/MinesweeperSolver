@@ -31,10 +31,15 @@ namespace MinesweeperSolver.NeuralSolver
             /// 11 - {8}
 
             /// Result:
-            /// 1st - if > 0.9 Open tile
-            /// 2nd - then if > 0.9 Flag tile
+            /// 1st - if between 0.45 and 0.55 Open tile
+            /// 2nd - then if between 0.45 and 0.55 Flag tile
 
-            return new ActivationNetwork(new SigmoidFunction(), (((lookDistance + 1) * lookDistance * 4) + 1) * 12 + 1, 256, 256, 128, 2);
+            /// TODO: weights are positive: SigmoidFunction
+            /// GaussianFunction
+            /// BernoulliFunction
+            /// SigmoidFunction
+            /// BipolarSigmoidFunction
+            return new ActivationNetwork(new BipolarSigmoidFunction(), (((lookDistance + 1) * lookDistance * 4) + 1) * 12 + 1, 256, 256, 128, 2);
         }
     }
 }
